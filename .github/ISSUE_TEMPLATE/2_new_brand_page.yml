@@ -1,0 +1,79 @@
+name: Márkaspecifikus naptár igénylése a weboldalon
+description: |
+  Ha szeretnél a márkaklubod számára saját naptárat igényelni ezen a weboldalon, itt kérheted.
+title: "[BRAND]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Készítünk az autós klubod számára eseménynaptárat, ami a publikus események mellett tartalmazza a klub eseményeit is.
+        A klubspecifikus eseménynaptárat viszont neked kell gondoznod. Te veszed fel rá az eseményeket. Lépések:
+        1. Kezdésnek készítened kell egy Google naptárat a calendar.google.com-on amit majd szerkeszteni fogsz.
+        2. Ezután kattints a naptár mellett a ... menüre, ott a Beállítások és Megosztásra.
+        3. Görgess a "+ Személyek és csoportok hozzáadása" gombig, majd kattints rá.
+        4. Írd be a "toyotaesemenyek@gmail.com" címet (Autós Események), majd nyomj a Küldés gombra.
+        5. Töltsd ki az alábbi kérdőívet.
+
+  - type: input
+    id: url
+    attributes:
+      label: Az aloldal azonosítója
+      description: |
+        Csupa kisbetűkkel, ékezetek és különleges karakterek nélkül. Ez szerepel a web címben.
+    validations:
+      required: true
+  - type: input
+    id: group-name
+    attributes:
+      label: Az autós csoport neve
+      description: |
+        Írd be a csoportod nevét (ahogy a weblap címében megjelenik)
+    validations:
+      required: true
+  - type: input
+    id: group-desc
+    attributes:
+      label: Az oldalad rövid leírása (a csoportnév mellé kerül)
+      description: |
+        Írd be a csoportod nevét (ahogy a weblap címében megjelenik)
+    validations:
+      required: true
+  - type: dropdown
+    id: calendar-colour
+    attributes:
+      label: A naptárad és eseményei színe
+      description: |
+        Milyen színnel jelenjen meg a naptárad és eseményei? A google naptármegosztás litáján látszanak.
+      options:
+        - Kakaó
+        - Flamingó
+        - Paradicsom
+        - Mandarin
+        - Tök
+        - Mangó
+        - Eukaliptusz
+        - Bazsalikom
+        - Pisztácia
+        - Avokádó
+        - Citrom
+        - Banán
+        - Zsálya
+        - Páva
+        - Kobalt
+        - Áfonya
+        - Levendula
+        - Akáclila
+        - Nyírfa
+        - Retek
+        - Cseresznyevirág
+        - Szőlő
+        - Ametiszt
+    validations:
+      required: true
+  - type: textarea
+    id: comments
+    attributes:
+      label: Egyéb kiegészítések
+      description: |
+        Ha bármi egyebet meg szeretnél osztani, vagy különleges kérések esetén (pl. egyszerre márka- és klubnaptárak).
