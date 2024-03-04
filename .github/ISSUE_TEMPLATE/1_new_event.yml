@@ -1,0 +1,40 @@
+name: Esemény Hozzáadásának kérése
+description: |
+  Javasolj egy új eseményt, aminek a naptárban a helye.
+title: "[EVENT]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Kérlek töltsd ki az alábbi kérdőívet.
+  - type: input
+    id: facebook-link
+    attributes:
+      label: Facebook Link
+      description: |
+        Másold be a Facebook linkjét az eseménynek.
+        Ez a naptár Facebook integrációval működik, így csak olyan eseményt tudunk felvenni aminek elérhető a linkje.
+        Amennyiben a Facebook esemény csak zárt csoportban látszik, az alábbi Facebook felhasználót be kell engedni a csoportba:
+        https://www.facebook.com/profile.php?id=100079303734674
+    validations:
+      required: true
+  - type: dropdown
+    id: event-type
+    attributes:
+      label: Az esemény típusa
+      description: |
+        Az esemény típusa
+      options:
+        - Autós találkozó (márkafüggetlen)
+        - Autós fesztivál (márkafüggetlen)
+        - Autós/veterános túra (márkafüggetlen, nem verseny)
+        - Autós vagy tuning kiállítás (márkafüggetlen)
+        - Veteránbörze
+        - Nyílt pályanap
+  - type: textarea
+    id: comments
+    attributes:
+      label: Egyéb kiegészítések
+      description: |
+        Szeretnél bármi egyebet megosztani az oldalüzemeltetőkkel az eseménnyel kapcsolatban?

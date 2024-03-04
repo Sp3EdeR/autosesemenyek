@@ -1,0 +1,36 @@
+name: Hiba Bejelentés
+description: |
+  Új hiba bejelentése a naptár weblapjának funkcionalitásával kapcsolatban.
+title: "[BUG]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Kérlek töltsd ki az alábbi kérdőívet.
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: A hiba leírása
+      description: |
+        Egy egyértelmű és tömör leírása a hibának.
+    validations:
+      required: true
+  - type: textarea
+    id: bug-expected
+    attributes:
+      label: A várt, helyes működés
+      description: |
+        Mit várnál, hogy történjen a tapasztaltak helyett?
+  - type: input
+    id: browser
+    attributes:
+      label: A böngésződ
+      description: |
+        Mi a web böngésződ neve és verziója?
+  - type: textarea
+    id: bug-other
+    attributes:
+      label: Egyéb információ
+      description: |
+        Szeretnél még bármi mást mondani ezzel a hibával kapcsolatban?
