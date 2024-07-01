@@ -1,27 +1,19 @@
-a,
-a:focus,
-a:hover {
-  color: #fff;
-}
-
-
 html,
 body {
   min-height: 100vh;
 }
 
-body {
-  display: -ms-flexbox;
-  display: -webkit-box;
-  display: flex;
-  -ms-flex-pack: center;
-  -webkit-box-pack: center;
-  justify-content: center;
-  color: #fff;
-  text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
-  box-shadow: inset 0 0 10rem rgba(0, 0, 0, 1);
+.background-image {
   background-image: url('background.jpg');
+  background-position: center;
   background-size: cover;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  box-shadow: inset 0 0 10rem rgba(0, 0, 0, 1);
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: -1;
 }
 
 .cover-container {
@@ -30,6 +22,17 @@ body {
   min-height: 100vh;
   max-width: 48em;
   width: 100%;
+  text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
+}
+
+@media (prefers-color-scheme: dark) {
+  .cover-container {
+    box-shadow: 0 0 1rem rgba(255, 255, 255, .5);
+    filter: invert(1) hue-rotate(180deg);
+  }
+  .background-image {
+    filter: brightness(0.5);
+  }
 }
 
 iframe {
@@ -42,6 +45,7 @@ iframe {
 
 .masthead-brand {
   margin-bottom: 0;
+  margin-right: .5rem;
 }
 
 .nav-masthead .nav-link {
@@ -94,7 +98,7 @@ iframe {
 
 
 .mastfoot {
-  color: rgba(255, 255, 255, .5);
+  color: rgba(0, 0, 0, .5);
   font-size: small;
 }
 
@@ -105,6 +109,7 @@ iframe {
 }
 
 .controls-calendar-tabs {
+  border-bottom: #e3e9ff 2px solid;
   padding: 0;
   position: absolute;
   right: 2px;
@@ -135,4 +140,8 @@ iframe {
   color: #000;
   cursor: default;
   font-weight: bold;
+}
+
+.controls-calendar-switches {
+  flex-wrap: wrap;
 }
