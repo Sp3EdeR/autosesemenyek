@@ -43,6 +43,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha256-+IZRbz1B6ee9mUx/ejmonK+ulIP5A5bLDd6v6NHqXnI=" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@forevolve/bootstrap-dark@2.1.1/dist/css/toggle-bootstrap.min.css" integrity="sha256-FrYhUW1FIy6GrbYaAdOOeWzysJaYHvXRTvC5JkpI2Io=" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@forevolve/bootstrap-dark@2.1.1/dist/css/toggle-bootstrap-dark.min.css" integrity="sha256-hWYw+cCWpNThkcILHcXs4XtjvGXBUCaPN0hG3q9S13o=" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.js" integrity="sha256-FaAOdYdEAZkWmbgMVjrb7kq4BJ46vaUUiDJ3t7O+oT8=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 
@@ -57,7 +58,21 @@
     </header>
 
     <main role="main" class="inner cover">
-      <iframe src="https://calendar.google.com/calendar/u/0/embed?height=600&wkst=2&bgcolor=%23eef1f8&mode=AGENDA&ctz=Europe/Budapest&showTz=0&showPrint=0&showDate=1&showTabs=1&showCalendars=0&showTitle=0&src=6ed4253a01425b241902ebb68e9fdada28e89336654eed1bd54ccd8139ce1276%40group.calendar.google.com&color=%23616161" style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+      <div class="calendar-container">
+        <script src="calendar.js" id="calendar-script"></script>
+        <script>
+          calendars.init({
+            'Általános Események': {
+              'url': '&src=6ed4253a01425b241902ebb68e9fdada28e89336654eed1bd54ccd8139ce1276%40group.calendar.google.com&color=%23616161',
+              'clr': '#616161'
+            },
+            'Versenynaptárak': {
+              'url': '&src=e2c1f0f733fdf9809b81894ca9bda56e09fea2fee9385d715b7fdeb60fc029ae@group.calendar.google.com&src=29b1b2c34ddb5b701b336076af1feed962c8fd42c21cc6403e347d40829bfb0b@group.calendar.google.com&color=%23B39DDB&color=%237986CB',
+              'clr': '#5229A3'
+            }
+          });
+        </script>
+      </div>
       <p>Nem kell mindig idelátogatnod, vedd fel a Google Naptáradba, hogy mindig naprakész lehess!</p>
       <p>A Facebook esemény linket megtalálod az események leírásában.</p>
     </main>

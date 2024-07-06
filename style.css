@@ -57,7 +57,7 @@ iframe {
   border-bottom-color: rgba(255, 255, 255, .25);
 }
 
-.nav-masthead .nav-link + .nav-link {
+.nav-masthead .nav-link+.nav-link {
   margin-left: 1rem;
 }
 
@@ -70,6 +70,7 @@ iframe {
   .masthead-brand {
     float: left;
   }
+
   .nav-masthead {
     float: right;
   }
@@ -85,6 +86,7 @@ iframe {
 .cover {
   padding: 0 1.5rem;
 }
+
 .cover .btn-lg {
   padding: .75rem 1.25rem;
   font-weight: 700;
@@ -94,4 +96,43 @@ iframe {
 .mastfoot {
   color: rgba(255, 255, 255, .5);
   font-size: small;
+}
+
+
+/* Google calendar tab style for generated tabs */
+.calendar-container {
+  position: relative;
+}
+
+.controls-calendar-tabs {
+  padding: 0;
+  position: absolute;
+  right: 2px;
+  top: -8px;
+  font-family: Arial, sans-serif;
+  font-size: small;
+  line-height: 1.0;
+  text-shadow: none;
+  white-space: nowrap;
+}
+
+.controls-calendar-tabs td {
+  padding-left: 4px;
+}
+
+.controls-calendar-tabs td div {
+  background-color: #e8eef7;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  color: #20c;
+  cursor: pointer;
+  padding: 7px 5px 6px;
+  white-space: nowrap;
+}
+
+.controls-calendar-tabs td div.selected {
+  background-color: #e3e9ff;
+  color: #000;
+  cursor: default;
+  font-weight: bold;
 }
