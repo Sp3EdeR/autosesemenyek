@@ -83,7 +83,7 @@ const calendars = new class Calendars {
                 props.on != false :
                 pageStorage.getItem(id) == 'true';
 
-            const ctrl = $('<div class="custom-control custom-switch mr-sm-2">' +
+            const ctrl = $(`<div class="custom-control custom-switch mr-sm-2"${props.hidden ? ' style="display: none"' : ''}>` +
                 `<input type="checkbox" class="custom-control-input" id="${id}" value="${props.url}" ${isEnabled ? 'checked' : ''}>` +
                 `<label class="custom-control-label" for="${id}" style="color: ${props.clr}">${name}</label>` +
                 '</div>');
