@@ -108,38 +108,113 @@ iframe {
   position: relative;
 }
 
-.controls-calendar-tabs {
-  border-bottom: #e3e9ff 2px solid;
-  padding: 0;
+.controls-calendar-view {
   position: absolute;
-  right: 2px;
-  top: -8px;
-  font-family: Arial, sans-serif;
-  font-size: small;
-  line-height: 1.0;
+  right: 12px;
+  top: 10px;
+  height: 48px;
+}
+
+@font-face {
+  font-family: "Google Sans";
+  font-weight: 300 400;
+  src: url("https://sp3eder.github.io/Google-Sans-Font/GoogleSans-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Google Sans";
+  font-weight: 500 700;
+  src: url("https://sp3eder.github.io/Google-Sans-Font/GoogleSans-Medium.ttf") format("truetype");
+}
+
+.controls-calendar-view {
+  font-family: "Google Sans",Roboto,Arial,sans-serif;
+  font-size: 14px;
+  font-weight: 400;
   text-shadow: none;
-  white-space: nowrap;
 }
 
-.controls-calendar-tabs td {
-  padding-left: 4px;
+/* Wide view button */
+.controls-calendar-view .dropdown-toggle {
+  background-color: #f0f4f9;
+  border: #747775 solid 1px;
+  border-radius: 9999px;
+  color: #1f1f1f;
+  font-weight: 500;
+  height: 36px;
+  line-height: normal;
+  padding: 0;
+  padding-inline-start: 26px;
+  padding-inline-end: 20px;
+  transition: 0.2s;
+}
+.controls-calendar-view .dropdown-toggle:hover {
+  background-color: #dfe3e7;
+}
+.controls-calendar-view .dropdown-toggle:active {
+  background-color: #cbcfd2;
+}
+/* Downtick arrow */
+.controls-calendar-view .dropdown-toggle::after {
+  border-top-color: #444746;
+  margin-left: 8px;
+  vertical-align: .2em;
 }
 
-.controls-calendar-tabs td div {
-  background-color: #e8eef7;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  color: #20c;
-  cursor: pointer;
-  padding: 7px 5px 6px;
-  white-space: nowrap;
+.controls-calendar-view .dropdown-menu {
+  background-color: #e5edf6;
+  border: #0000 solid 1px;
+  border-radius: 4px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, .3);
+  font-size: 14px;
+  line-height: 16px;
+  min-width: 112px;
 }
 
-.controls-calendar-tabs td div.selected {
-  background-color: #e3e9ff;
-  color: #000;
-  cursor: default;
-  font-weight: bold;
+.controls-calendar-view .dropdown-item {
+  padding: 12px;
+}
+.controls-calendar-view .dropdown-item:hover {
+  background-color: #d5dce5;
+}
+
+.calendar-logo-hider {
+  background-color: #f0f4f9;
+  position: absolute;
+  top: 565px;
+  right: 12px;
+  height: 25px;
+  width: 125px;
+}
+
+/* Narrow view */
+@media (max-width: 720px) {
+  .controls-calendar-view {
+    position: absolute;
+    right: 4px;
+    top: 6px;
+    height: 48px;
+  }
+
+  .controls-calendar-view button.dropdown-toggle {
+    border: transparent 0px;
+    border-radius: 0;
+    font-size: 18px;
+    font-weight: 400;
+    height: 30px;
+    line-height: 28px;
+    padding-inline-start: 16px;
+    padding-inline-end: 8px;
+  }
+
+  .calendar-logo-hider {
+    display: none;
+  }
+
+  .controls-calendar-view .dropdown-toggle:hover,
+  .controls-calendar-view .dropdown-toggle:active {
+    background-color: #f0f4f9;
+  }
 }
 
 .controls-calendar-switches {
