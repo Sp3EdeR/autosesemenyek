@@ -20,6 +20,7 @@ class CalendarTabs {
     constructor(container) {
         this._container = container;
         this._button = container.find('button').first();
+        this._button_faces = this._button.find('.button-face');
         this._tabs = container.find('.dropdown-item');
         this._each(tab => {
             const id = tab.attr('id');
@@ -37,13 +38,10 @@ class CalendarTabs {
         this.selectedId = id;
         pageStorage.setItem('tabId', id);
 
-        const shortIdToName = {
-            'AGENDA': 'Ütemezés',
-            'WEEK': 'Hét',
-            'MONTH': 'Hónap'
-        };
         var shortId = id.replace('tab-controller-', '');
-        this._button.text(shortIdToName[shortId]);
+        this._button_faces.each(function() {
+            $(this).toggleClass('d-none', $(this).attr('data-mode') != shortId);
+        });
 
         if (this._onTabChanged)
             this._onTabChanged(shortId);
@@ -62,14 +60,16 @@ const calendars = new class Calendars {
         this._container.append($(`
 <iframe style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
 <div class="controls-calendar-view">
-    <button class="dropdown-toggle" type="button" id="viewButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Ütemezés
-    </button>
-    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="viewButton">
-        <a class="dropdown-item" href="#" id="tab-controller-AGENDA">Ütemezés</a>
-        <a class="dropdown-item" href="#" id="tab-controller-WEEK">Hét</a>
-        <a class="dropdown-item" href="#" id="tab-controller-MONTH">Hónap</a>
-    </div>
+  <button class="dropdown-toggle" type="button" id="viewButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="1">
+    <span class="button-face" data-mode="AGENDA"><i class="fa-solid fa-bars button-short"></i><span class="button-long">Ütemezés</span></span>
+    <span class="button-face d-none" data-mode="WEEK"><i class="fa-solid fa-table-columns button-short"></i><span class="button-long">Hét</span></span>
+    <span class="button-face d-none" data-mode="MONTH"><i class="fa-solid fa-table button-short"></i><span class="button-long">Hónap</span></span>
+  </button>
+  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="viewButton">
+    <a class="dropdown-item" href="#" id="tab-controller-AGENDA"><i class="fa-solid fa-bars mr-2"></i>Ütemezés</a>
+    <a class="dropdown-item" href="#" id="tab-controller-WEEK"><i class="fa-solid fa-table-columns mr-2"></i>Hét</a>
+    <a class="dropdown-item" href="#" id="tab-controller-MONTH"><i class="fa-solid fa-table mr-2"></i>Hónap</a>
+  </div>
 </div>
 <div class="calendar-logo-hider"></div>
 <p class="controls-calendar-switches"></p>

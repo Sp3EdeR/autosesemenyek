@@ -148,6 +148,9 @@ iframe {
   padding-inline-end: 20px;
   transition: 0.2s;
 }
+.controls-calendar-view .button-short {
+  display: none;
+}
 .controls-calendar-view .dropdown-toggle:hover {
   background-color: #dfe3e7;
 }
@@ -206,8 +209,11 @@ iframe {
     padding-inline-start: 16px;
     padding-inline-end: 8px;
   }
-
-  .calendar-logo-hider {
+  .controls-calendar-view .button-short {
+    display: inline;
+  }
+  .calendar-logo-hider,
+  .controls-calendar-view .button-long {
     display: none;
   }
 
