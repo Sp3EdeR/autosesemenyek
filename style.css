@@ -112,13 +112,6 @@ iframe {
   position: relative;
 }
 
-.controls-calendar-view {
-  position: absolute;
-  right: 12px;
-  top: 10px;
-  height: 48px;
-}
-
 @font-face {
   font-family: "Google Sans";
   font-weight: 300 400;
@@ -131,11 +124,30 @@ iframe {
   src: url("https://sp3eder.github.io/Google-Sans-Font/GoogleSans-Medium.ttf") format("truetype");
 }
 
+/* Full cover for the iframe feedback button */
+.feedback-cover {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  width: 50px;
+  height: 50px;
+  z-index: 1;
+}
+
 .controls-calendar-view {
   font-family: "Google Sans",Roboto,Arial,sans-serif;
   font-size: 14px;
   font-weight: 400;
+  pointer-events: none;
+  position: absolute;
+  right: 12px;
+  top: 10px;
   text-shadow: none;
+  z-index: 2;
+}
+
+.controls-calendar-view > * {
+  pointer-events: auto;
 }
 
 /* Wide view button */
@@ -207,7 +219,8 @@ iframe {
   .controls-calendar-view .button-short {
     display: inline;
   }
-  .controls-calendar-view .button-long {
+  .controls-calendar-view .button-long,
+  .controls-calendar-view .feedback-cover {
     display: none;
   }
 
