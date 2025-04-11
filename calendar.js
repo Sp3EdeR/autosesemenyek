@@ -119,3 +119,6 @@ const calendars = new class Calendars {
         return name.toLowerCase().replaceAll(' ', '');
     }
 };
+
+// Hide popups when clicking into the iframe, or away from the tab
+$(window).on('blur', () => $('.dropdown-toggle').dropdown('hide'));
