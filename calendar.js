@@ -71,7 +71,6 @@ const calendars = new class Calendars {
     <a class="dropdown-item" href="#" id="tab-controller-MONTH"><i class="fa-solid fa-table mr-2"></i>Hónap</a>
   </div>
 </div>
-<div class="calendar-logo-hider"></div>
 <p class="controls-calendar-switches"></p>
 `));
 

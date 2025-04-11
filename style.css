@@ -185,15 +185,6 @@ iframe {
   background-color: #d5dce5;
 }
 
-.calendar-logo-hider {
-  background-color: #f0f4f9;
-  position: absolute;
-  top: 565px;
-  right: 12px;
-  height: 25px;
-  width: 125px;
-}
-
 /* Narrow view */
 @media (max-width: 720px) {
   .controls-calendar-view {
@@ -216,7 +207,6 @@ iframe {
   .controls-calendar-view .button-short {
     display: inline;
   }
-  .calendar-logo-hider,
   .controls-calendar-view .button-long {
     display: none;
   }
