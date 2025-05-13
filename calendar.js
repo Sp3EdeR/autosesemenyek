@@ -54,12 +54,25 @@ class CalendarTabs {
     }
 }
 
+class CalendarStats {
+    constructor() {
+        this.initialized = false;
+        $.ajax("https://sp3eder.github.io/autosesemenyek-stats/stats.json", { dataType: "json" })
+            .done(stats => {
+                Object.assign(this, stats);
+                this.initialized = true;
+                if (this._onStatsLoaded)
+                    this._onStatsLoaded(this);
+            });
+    }
+    onStatsLoaded(onStatsLoaded) { this._onStatsLoaded = onStatsLoaded; }
+}
+
 const calendars = new class Calendars {
     constructor() {
         this._container = $('#calendar-script').parent();
         this._container.append($(`
 <iframe style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
-<div class="feedback-cover"></div>
 <div class="controls-calendar-view">
   <button class="dropdown-toggle" type="button" id="viewButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="1">
     <span class="button-face" data-mode="AGENDA"><i class="fa-solid fa-bars button-short"></i><span class="button-long">Ütemezés</span></span>
@@ -72,6 +85,7 @@ const calendars = new class Calendars {
     <a class="dropdown-item" href="#" id="tab-controller-MONTH"><i class="fa-solid fa-table mr-2"></i>Hónap</a>
   </div>
 </div>
+<div class="controls-calendar-count rounded-circle" id="eventsCount"></div>
 <p class="controls-calendar-switches"></p>
 `));
 
@@ -84,8 +98,12 @@ const calendars = new class Calendars {
 
         this.tabs = new CalendarTabs(this._container.children('.controls-calendar-view').first());
         this.tabs.onTabChanged(() => this.update());
+
+        this.stats = new CalendarStats();
+        this.stats.onStatsLoaded(() => this.updateStats());
     }
     init(data) {
+        this._data = data;
         this._switches = [];
         for (const [name, props] of Object.entries(data)) {
             const id = Calendars._normName(name);
@@ -94,7 +112,7 @@ const calendars = new class Calendars {
                 pageStorage.getItem(id) == 'true';
 
             const ctrl = $(`<div class="custom-control custom-switch mr-sm-2"${props.hidden ? ' style="display: none"' : ''}>` +
-                `<input type="checkbox" class="custom-control-input" id="${id}" value="${props.url}" ${isEnabled ? 'checked' : ''}>` +
+                `<input type="checkbox" class="custom-control-input" id="${id}" value="${name}" ${isEnabled ? 'checked' : ''}>` +
                 `<label class="custom-control-label" for="${id}" style="color: ${props.clr}">${name}</label>` +
                 '</div>');
             this._switches.push(ctrl.children('input').on('change', event => {
@@ -109,15 +127,29 @@ const calendars = new class Calendars {
         this.update();
     }
     update() {
+        this._selectedCalData = this._switches.filter(ctrl => ctrl.prop('checked'))
+            .map(ctrl => this._data[ctrl.attr('value')]);
+
         var options = '&mode=' + this.tabs.currentMode;
-        options = this._switches.reduce(
-            (accumulator, ctrl) =>
-                ctrl.prop('checked') ? accumulator + ctrl.attr('value') : accumulator
-            , options);
+        options = this._selectedCalData.reduce(
+            (accumul, data) => accumul + Calendars._makeUrl(data.cals), options);
         this._calendarContainer.attr('src', this._urlBase + options);
+
+        this.updateStats();
+    }
+    updateStats() {
+        if (!this.stats.initialized || !this._selectedCalData)
+            return;
+        const calIds = this._selectedCalData.map(d => d.cals).flat().map(c => c.id);
+        const eventCount = calIds.reduce(
+            (accumul, id) => accumul + (this.stats[id] ?? 0), 0);
+        $('#eventsCount').html(`&raquo; ${eventCount} esemény`);
     }
     static _normName(name) {
         return name.toLowerCase().replaceAll(' ', '');
+    }
+    static _makeUrl(calendarsData) {
+        return Array.from(calendarsData, cal => `&src=${encodeURIComponent(cal.id)}&color=${encodeURIComponent(cal.clr)}`).join('')
     }
 };
 

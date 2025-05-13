@@ -197,6 +197,18 @@ iframe {
   background-color: #d5dce5;
 }
 
+.controls-calendar-count {
+  font-family: "Google Sans",Roboto,Arial,sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  pointer-events: none;
+  position: absolute;
+  text-shadow: none;
+  top: 570px;
+  width: 100%;
+  z-index: 2;
+}
+
 /* Narrow view */
 @media (max-width: 720px) {
   .controls-calendar-view {
@@ -227,6 +239,10 @@ iframe {
   .controls-calendar-view .dropdown-toggle:hover,
   .controls-calendar-view .dropdown-toggle:active {
     background-color: #f0f4f9;
+  }
+
+  .controls-calendar-count {
+    top: 576px;
   }
 }
 
