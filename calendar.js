@@ -57,7 +57,7 @@ class CalendarTabs {
 class CalendarStats {
     constructor() {
         this.initialized = false;
-        $.ajax("https://sp3eder.github.io/autosesemenyek-stats/stats.json", { dataType: "json" })
+        $.ajax("https://sp3eder.github.io/autosesemenyek-meta/stats.json", { dataType: "json" })
             .done(stats => {
                 Object.assign(this, stats);
                 this.initialized = true;
