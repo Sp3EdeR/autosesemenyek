@@ -57,6 +57,10 @@ class CalendarTabs {
 class CalendarStats {
     constructor() {
         this.initialized = false;
+        this._updateStats();
+    }
+    onStatsLoaded(onStatsLoaded) { this._onStatsLoaded = onStatsLoaded; }
+    _updateStats() {
         $.ajax("https://sp3eder.github.io/autosesemenyek-meta/stats.json", { dataType: "json" })
             .done(stats => {
                 Object.assign(this, stats);
@@ -64,8 +68,8 @@ class CalendarStats {
                 if (this._onStatsLoaded)
                     this._onStatsLoaded(this);
             });
+        setInterval(() => this._updateStats(), 1000 * 60 * 5);
     }
-    onStatsLoaded(onStatsLoaded) { this._onStatsLoaded = onStatsLoaded; }
 }
 
 const calendars = new class Calendars {
