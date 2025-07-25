@@ -76,7 +76,7 @@ const calendars = new class Calendars {
     constructor() {
         this._container = $('#calendar-script').parent();
         this._container.append($(`
-<iframe style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+<iframe style="width: 100%; height: 600px;" scrolling="no"></iframe>
 <div class="controls-calendar-view">
   <button class="dropdown-toggle" type="button" id="viewButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="1">
     <span class="button-face" data-mode="AGENDA"><i class="fa-solid fa-bars button-short"></i><span class="button-long">Ütemezés</span></span>
