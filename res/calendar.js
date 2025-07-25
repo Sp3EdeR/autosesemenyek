@@ -130,6 +130,12 @@ const calendars = new class Calendars {
         this._switchesContainer.addClass(['form-check', 'form-check-inline']);
         this.update();
     }
+    openSubscription() {
+        var calIds = this._getSelectedCalIds();
+        if (calIds.length == 0)
+            return;
+        window.open('https://calendar.google.com/calendar/r?cid=' + calIds.join('&cid='));
+    }
     update() {
         this._selectedCalData = this._switches.filter(ctrl => ctrl.prop('checked'))
             .map(ctrl => this._data[ctrl.attr('value')]);
@@ -148,6 +154,9 @@ const calendars = new class Calendars {
         const eventCount = calIds.reduce(
             (accumul, id) => accumul + (this.stats[id] ?? 0), 0);
         $('#eventsCount').html(`&raquo; ${eventCount} esemény`);
+    }
+    _getSelectedCalIds() {
+        return this._selectedCalData.map(d => d.cals).flat().map(c => c.id);
     }
     static _normName(name) {
         return name.toLowerCase().replaceAll(' ', '');
