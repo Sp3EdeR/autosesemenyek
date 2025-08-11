@@ -168,3 +168,8 @@ const calendars = new class Calendars {
 
 // Hide popups when clicking into the iframe, or away from the tab
 $(window).on('blur', () => $('.dropdown-toggle').dropdown('hide'));
+
+// Samsung Browser workaround
+if (navigator.userAgent.match(/SamsungBrowser/)) {
+    $('body').addClass('samsung-browser');
+}
