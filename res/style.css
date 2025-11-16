@@ -53,7 +53,7 @@ a:hover {
     filter: invert(1) hue-rotate(180deg);
   }
 
-  .samsung-browser .calendar-container iframe {
+  .browser-forced-dark-mode .calendar-container iframe {
     filter: invert(1) hue-rotate(-180deg);
   }
 }

@@ -169,7 +169,17 @@ const calendars = new class Calendars {
 // Hide popups when clicking into the iframe, or away from the tab
 $(window).on('blur', () => $('.dropdown-toggle').dropdown('hide'));
 
-// Samsung Browser workaround
+// Samsung Browser forced dark mode workaround
 if (navigator.userAgent.match(/SamsungBrowser/)) {
     $('body').addClass('samsung-browser');
+    // Detect forced dark mode by rendering a white image and checking pixel color
+    const img = new Image();
+    img.onload = function() {
+        const ctx = document.createElement('canvas').getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+        if ((r & b & g) < 255)
+            $('body').addClass('browser-forced-dark-mode');
+    };
+    img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IndoaXRlIi8+PC9zdmc+';
 }
