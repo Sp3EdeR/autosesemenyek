@@ -76,7 +76,7 @@ const calendars = new class Calendars {
     constructor() {
         this._container = $('#calendar-script').parent();
         this._container.append($(`
-<iframe style="width: 100%; height: 600px;" scrolling="no"></iframe>
+<iframe scrolling="no"></iframe>
 <div class="controls-calendar-view">
   <button class="dropdown-toggle" type="button" id="viewButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="1">
     <span class="button-face" data-mode="AGENDA"><i class="fa-solid fa-bars button-short"></i><span class="button-long">Ütemezés</span></span>
@@ -182,4 +182,9 @@ if (navigator.userAgent.match(/SamsungBrowser/)) {
             $('body').addClass('browser-forced-dark-mode');
     };
     img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IndoaXRlIi8+PC9zdmc+';
+}
+
+// Test function to check app view
+function toggleFullscreen() {
+    $('html').toggleClass('fullscreen');
 }

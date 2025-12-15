@@ -95,6 +95,11 @@ header {
   font-weight: 700;
 }
 
+main iframe {
+  width: 100%;
+  height: 600px;
+}
+
 /* Google calendar tab style for generated tabs */
 .calendar-container {
   position: relative;
@@ -288,4 +293,34 @@ footer .xref-text {
 
 .controls-calendar-switches {
   flex-wrap: wrap;
+}
+
+/* Fullscreen view for the app */
+.fullscreen .background-image,
+.fullscreen header,
+.fullscreen footer,
+.fullscreen main > p,
+.fullscreen .controls-calendar-count {
+  display: none;
+}
+
+.fullscreen .cover-container {
+  margin: 0 !important;
+  max-width: 100%;
+}
+
+.fullscreen main,
+.fullscreen .calendar-container,
+.fullscreen .calendar-container iframe {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.fullscreen main iframe {
+  height: 100px;
+}
+
+.fullscreen .controls-calendar-switches {
+  margin: auto;
 }
