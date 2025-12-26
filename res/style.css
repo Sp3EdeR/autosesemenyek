@@ -324,3 +324,23 @@ footer .xref-text {
 .fullscreen .controls-calendar-switches {
   margin: auto;
 }
+
+/* 526px is only an estimate for button collapse */
+@media (max-height: 526px) {
+  .fullscreen .controls-calendar-view .dropdown-toggle {
+    height: 28px;
+  }
+
+  .controls-calendar-view::after {
+    position: absolute;
+    background-color: #f0f4f9;
+    content: " ";
+    width: 30px;
+    height: 30px;
+    display: block;
+    top: -4px;
+    right: -7px;
+    z-index: -1;
+    pointer-events: all;
+  }
+}
