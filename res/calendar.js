@@ -80,12 +80,10 @@ const calendars = new class Calendars {
 <div class="controls-calendar-view">
   <button class="dropdown-toggle" type="button" id="viewButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="1">
     <span class="button-face" data-mode="AGENDA"><i class="fa-solid fa-bars button-short"></i><span class="button-long">Ütemezés</span></span>
-    <span class="button-face d-none" data-mode="WEEK"><i class="fa-solid fa-table-columns button-short"></i><span class="button-long">Hét</span></span>
     <span class="button-face d-none" data-mode="MONTH"><i class="fa-solid fa-table button-short"></i><span class="button-long">Hónap</span></span>
   </button>
   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="viewButton">
     <a class="dropdown-item" href="#" id="tab-controller-AGENDA"><i class="fa-solid fa-bars mr-2"></i>Ütemezés</a>
-    <a class="dropdown-item" href="#" id="tab-controller-WEEK"><i class="fa-solid fa-table-columns mr-2"></i>Hét</a>
     <a class="dropdown-item" href="#" id="tab-controller-MONTH"><i class="fa-solid fa-table mr-2"></i>Hónap</a>
   </div>
 </div>
