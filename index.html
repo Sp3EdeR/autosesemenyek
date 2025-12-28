@@ -45,6 +45,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/js/fontawesome.min.js" integrity="sha256-ayzx2znbpzG5nQ0bAkbeyDoc9IBzNudRe4OAevLf1hU=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <link href="res/style.css" rel="stylesheet">
+  <script src="https://sp3eder.github.io/huroutes/res/app-toasts.js"></script>
 </head>
 
 <body class="text-center">
@@ -122,6 +123,35 @@
             <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSf1gZhKe_ly7bENp-OwbTrkkjMd1gIvZpwa2lrcOFtfBYcpwQ/viewform?usp=header"></iframe>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div aria-live="polite" aria-atomic="true" style="position: fixed; right: 10px; top:10px; min-height: 200px; z-index: 1049;">
+    <div id="toast-android-app" role="alert" aria-live="assertive" aria-atomic="true" class="toast hide" data-autohide="false">
+      <div class="toast-header">
+        <strong class="mr-auto">Android Alkalmazás</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="toast-body">
+        Elérhető az autós események naptára a telefonodra, natív alkalmazásként! Ha ki szeretnéd próbálni,
+        <a href="https://github.com/Sp3EdeR/huroutes-android/releases" target="_blank">innen töltheted le</a>.
+      </div>
+    </div>
+    <div id="toast-app-update" role="alert" aria-live="assertive" aria-atomic="true" class="toast hide" data-autohide="false">
+      <div class="toast-header">
+        <strong class="mr-auto">Alkalmazás Frissítése</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="toast-body">
+        Elérhető ennek az alkalmazásnak egy új verziója!
+        <a href="#" target="_blank">Innen töltheted le</a> a telepítőjét.
+        Letöltés után kézzel szükséges indítani a fájlt a frissítéshez.
       </div>
     </div>
   </div>
