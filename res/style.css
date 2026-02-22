@@ -5,6 +5,7 @@
 html,
 body {
   min-height: 100vh;
+  --fa-width: auto;
 }
 
 a {
@@ -98,6 +99,10 @@ header {
 main iframe {
   width: 100%;
   height: 600px;
+}
+
+main p, main p.form-check {
+  margin-bottom: 0.5rem;
 }
 
 /* Google calendar tab style for generated tabs */

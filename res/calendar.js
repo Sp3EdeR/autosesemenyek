@@ -24,7 +24,10 @@ class CalendarTabs {
         this._tabs = container.find('.dropdown-item');
         this._each(tab => {
             const id = tab.attr('id');
-            tab.click(() => this.select(id));
+            tab.click(event => {
+                event.preventDefault();
+                this.select(id);
+            });
         });
 
         var selectedId = 'tab-controller-AGENDA';
@@ -78,11 +81,11 @@ const calendars = new class Calendars {
         this._container.append($(`
 <iframe scrolling="no"></iframe>
 <div class="controls-calendar-view">
-  <button class="dropdown-toggle" type="button" id="viewButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="1">
+    <button class="dropdown-toggle" type="button" id="viewButton" data-bs-toggle="dropdown" aria-expanded="false" tabindex="1">
     <span class="button-face" data-mode="AGENDA"><i class="fa-solid fa-bars button-short"></i><span class="button-long">Ütemezés</span></span>
     <span class="button-face d-none" data-mode="MONTH"><i class="fa-solid fa-table button-short"></i><span class="button-long">Hónap</span></span>
   </button>
-  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="viewButton">
+    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="viewButton">
     <a class="dropdown-item" href="#" id="tab-controller-AGENDA"><i class="fa-solid fa-bars mr-2"></i>Ütemezés</a>
     <a class="dropdown-item" href="#" id="tab-controller-MONTH"><i class="fa-solid fa-table mr-2"></i>Hónap</a>
   </div>
