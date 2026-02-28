@@ -30,9 +30,9 @@ class CalendarTabs {
             });
         });
 
-        var selectedId = 'tab-controller-AGENDA';
-        if (pageStorage.getItem('tabId') && container.find('#' + selectedId).length)
-            selectedId = pageStorage.getItem('tabId');
+        let selectedId = pageStorage.getItem('tabId');
+        if (!selectedId || !container.find('#' + selectedId).length)
+            selectedId = 'tab-controller-AGENDA';
         this.select(selectedId);
     }
     select(id) {
@@ -41,7 +41,7 @@ class CalendarTabs {
         this.selectedId = id;
         pageStorage.setItem('tabId', id);
 
-        var shortId = id.replace('tab-controller-', '');
+        let shortId = id.replace('tab-controller-', '');
         this._button_faces.each(function() {
             $(this).toggleClass('d-none', $(this).attr('data-mode') != shortId);
         });
@@ -71,7 +71,7 @@ class CalendarStats {
                 if (this._onStatsLoaded)
                     this._onStatsLoaded(this);
             });
-        setInterval(() => this._updateStats(), 1000 * 60 * 5);
+        setTimeout(() => this._updateStats(), 1000 * 60 * 5);
     }
 }
 
@@ -79,19 +79,19 @@ const calendars = new class Calendars {
     constructor() {
         this._container = $('#calendar-script').parent();
         this._container.append($(`
-<iframe scrolling="no"></iframe>
+<iframe title="Naptár" class="overflow-hidden m-0">Naptár betöltése...</iframe>
 <div class="controls-calendar-view">
     <button class="dropdown-toggle" type="button" id="viewButton" data-bs-toggle="dropdown" aria-expanded="false" tabindex="1">
     <span class="button-face" data-mode="AGENDA"><i class="fa-solid fa-bars button-short"></i><span class="button-long">Ütemezés</span></span>
     <span class="button-face d-none" data-mode="MONTH"><i class="fa-solid fa-table button-short"></i><span class="button-long">Hónap</span></span>
   </button>
     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="viewButton">
-    <a class="dropdown-item" href="#" id="tab-controller-AGENDA"><i class="fa-solid fa-bars mr-2"></i>Ütemezés</a>
-    <a class="dropdown-item" href="#" id="tab-controller-MONTH"><i class="fa-solid fa-table mr-2"></i>Hónap</a>
+    <a class="dropdown-item" href="#" id="tab-controller-AGENDA"><i class="fa-solid fa-bars me-2"></i>Ütemezés</a>
+    <a class="dropdown-item" href="#" id="tab-controller-MONTH"><i class="fa-solid fa-table me-2"></i>Hónap</a>
   </div>
 </div>
 <div class="controls-calendar-count rounded-circle" id="eventsCount"></div>
-<p class="controls-calendar-switches"></p>
+<p class="controls-calendar-switches p-0 mx-0"></p>
 `));
 
         this._calendarContainer = this._container.children('iframe').first();
@@ -112,13 +112,13 @@ const calendars = new class Calendars {
         this._switches = [];
         for (const [name, props] of Object.entries(data)) {
             const id = Calendars._normName(name);
-            var isEnabled = pageStorage.getItem(id) == null ?
+            let isEnabled = pageStorage.getItem(id) == null ?
                 props.on != false :
                 pageStorage.getItem(id) == 'true';
 
-            const ctrl = $(`<div class="custom-control custom-switch mr-2"${props.hidden ? ' style="display: none"' : ''}>` +
-                `<input type="checkbox" class="custom-control-input" id="${id}" value="${name}" ${isEnabled ? 'checked' : ''}>` +
-                `<label class="custom-control-label" for="${id}" style="color: ${props.clr}">${name}</label>` +
+            const ctrl = $(`<div class="form-check form-switch d-inline-block"${props.hidden ? ' style="display: none"' : ''}>` +
+                `<input type="checkbox" class="form-check-input" id="${id}" value="${name}" ${isEnabled ? 'checked' : ''}>` +
+                `<label class="form-check-label" for="${id}" style="color: ${props.clr}">${name}</label>` +
                 '</div>');
             this._switches.push(ctrl.children('input').on('change', event => {
                 pageStorage.setItem(id, $(event.target).prop('checked'));
@@ -132,7 +132,7 @@ const calendars = new class Calendars {
         this.update();
     }
     openSubscription() {
-        var calIds = this._getSelectedCalIds();
+        let calIds = this._getSelectedCalIds();
         if (calIds.length == 0)
             return;
         window.open('https://calendar.google.com/calendar/r?cid=' + calIds.join('&cid='));
@@ -141,7 +141,7 @@ const calendars = new class Calendars {
         this._selectedCalData = this._switches.filter(ctrl => ctrl.prop('checked'))
             .map(ctrl => this._data[ctrl.attr('value')]);
 
-        var options = '&mode=' + this.tabs.currentMode;
+        let options = '&mode=' + this.tabs.currentMode;
         options = this._selectedCalData.reduce(
             (accumul, data) => accumul + Calendars._makeUrl(data.cals), options);
         this._calendarContainer.attr('src', this._urlBase + options);

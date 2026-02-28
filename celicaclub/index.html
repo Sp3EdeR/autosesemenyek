@@ -38,23 +38,41 @@
   </script>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha256-2FMn2Zx6PuH5tdBQDRNwrOo60ts5wWPC9R8jK67b3t4=" crossorigin="anonymous" referrerpolicy="no-referrer">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@forevolve/bootstrap-dark@4.0.2/dist/css/bootstrap-light-prefers-dark.min.css" integrity="sha256-xCt9COKPjYCeVBZQucP8imNK80bkEqlrT4A2n1IdCPE=" crossorigin="anonymous" referrerpolicy="no-referrer">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans@5.2.10/index.css" integrity="sha256-DgDXFQXB8ZVeD/0eW8nW7FEA5BmUwx/vn6XTUR4z7to=" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:opsz@17..18&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <link href="../res/style.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../res/menu/menu.css">
+  <script src="../../res/menu/menu.js"></script>
+  <script src="../../res/app/app-toasts.js"></script>
 </head>
 
-<body class="text-center">
-  <div class="background-image"></div>
-  <div class="cover-container d-flex p-3 mx-auto flex-column">
-    <header class="mb-auto">
-      <div class="inner">
-        <h3 class="masthead-brand">Celica Club Eseménynaptár</h3>
-        Celica Clubos autós találkozók, és egyéb események
-      </div>
-      <hr>
+<body class="position-absolute w-100 h-100 m-0 text-center">
+  <div class="background-image overflow-hidden"></div>
+  <div class="d-flex flex-column w-100 h-100">
+    <script>
+      initMenu('events-tab', `
+        <ul id="navbarSocial" class="navbar-nav mt-5 mt-sm-0 ms-sm-auto py-sm-2 pe-sm-3">
+          <li class="nav-item">
+            <a href="#" data-bs-toggle="modal" data-bs-target="#addEventForm" class="form-ico pe-1" title="Esemény hozzáadása">
+              <i class="fa-regular fa-calendar-plus"></i>
+            </a>
+            <a href="https://www.facebook.com/autosesemenyek" target="_blank" rel="noopener noreferrer" class="social-ico mx-2" title="Facebook oldal">
+              <i class="fa-brands fa-facebook"></i>
+            </a>
+            <a href="https://m.me/autosesemenyek" target="_blank" rel="noopener noreferrer" class="social-ico" title="Messenger chat">
+              <i class="fa-brands fa-facebook-messenger"></i>
+            </a>
+          </li>
+        </ul>`);
+    </script>
+    <div class="cover-container position-relative p-3 w-100 mx-auto d-flex flex-column">
+      <header class="mb-0">
+        Celica Club Eseménynaptár: klubos autós találkozók, és egyéb események
     </header>
 
     <main class="inner cover">
@@ -96,20 +114,9 @@
         </script>
       </div>
       <p>A dátumválasztóval nézhetsz későbbi eseményeket. A jobb-felső gombbal nézetet válthatsz. Kattints az eseményre további infókhoz.</p>
-      <p>Kövesd az eseményeket <a href="javascript:calendars.openSubscription();">a Google naptáradban</a>, hogy mindig naprakész lehess!</p>
+        <p>Kövesd az eseményeket <a href="#" onclick="calendars.openSubscription(); event.preventDefault();">a Google naptáradban</a>, hogy mindig naprakész lehess!</p>
     </main>
-
-    <footer class="mt-auto">
-      <hr>
-      <div class="inner">
-        <p>
-          <a href="https://www.facebook.com/autosesemenyek" target="_blank" class="social-ico mr-1" title="Facebook oldal"><i class="fa-brands fa-facebook"></i></a>
-          <a href="https://m.me/autosesemenyek" target="_blank" class="social-ico mr-4" title="Messenger chat"><i class="fa-brands fa-facebook-messenger"></i></a>
-          <span class="xref-text">Ajánlott: <a href="https://sp3eder.github.io/" target="_blank" title="Autós alkalmazások gyűjteménye">Autós Appok Gyűjteménye</a></span>
-        </p>
-        <p>Kérj te is márkaspecifikus naptár oldalt, lépj kapcsolatba</p>
-      </div>
-    </footer>
+    </div>
   </div>
 </body>
 </html>

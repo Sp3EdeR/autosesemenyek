@@ -1,15 +1,12 @@
 :root {
   color-scheme: light dark;
-}
-
-html,
-body {
-  min-height: 100vh;
+  font-family: "Noto Sans","Google Sans",Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,"Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
   --fa-width: auto;
 }
 
 a {
   color: #007bff;
+  text-decoration: none;
 }
 
 a:hover {
@@ -24,19 +21,75 @@ a:hover {
   -moz-background-size: cover;
   -o-background-size: cover;
   box-shadow: inset 0 0 10rem rgba(0, 0, 0, 1);
+  inset: 0;
   position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
+  width: 100vw; height: 100vh;
+  width: 100svw; height: 100svh;
   z-index: -1;
+}
+
+#menu {
+  z-index: 10;
+}
+
+#menu .navbar-toggler {
+  color: #000;
+}
+
+#menu, #menu .offcanvas {
+  background-color: #f0f4f9;
+}
+
+@media (prefers-color-scheme: dark) {
+  #menu, #menu .offcanvas {
+    background-color: #080c11;
+  }
+}
+
+@media (min-width: 48em) {
+  #menu {
+    background-color: #0000004f;
+    box-shadow: 0 0 10px #00000080;
+  }
+  #menu .navbar-brand {
+      --bs-navbar-brand-color: #fff;
+  }
+  #menu, .navbar-nav {
+    --bs-nav-link-color: #ffffffab;
+    --bs-nav-link-hover-color: #ffffffc7;
+    --bs-nav-link-disabled-color: #ffffff80;
+    --bs-navbar-active-color: #fff;
+  }
+}
+
+#navbarSocial {
+  font-size: 24px;
+}
+
+#menu .form-ico {
+  color: #ff606d;
+}
+
+#menu .xref-text {
+  vertical-align: 4px;
 }
 
 .cover-container {
   background-color: #f0f4f9;
   box-shadow: 0 0 1rem rgba(0, 0, 0, .5);
   color: #212529;
-  min-height: 100vh;
+  flex: 1 1 auto;
   max-width: 48em;
-  width: 100%;
   text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
+  z-index: 0;
+}
+
+@media (min-width: 48em) {
+  .cover-container {
+    border-radius: 1rem;
+    flex: none;
+    z-index: 20;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -50,22 +103,13 @@ a:hover {
   .background-image {
     filter: brightness(0.5);
   }
-  .form-container {
-    filter: invert(1) hue-rotate(180deg);
-  }
 
   .browser-forced-dark-mode .calendar-container iframe {
     filter: invert(1) hue-rotate(-180deg);
   }
 }
 
-iframe {
-  border: 0;
-  margin: 0;
-  overflow: hidden;
-}
-
-header, footer {
+header {
   padding: 0 12px;
 }
 
@@ -108,18 +152,6 @@ main p, main p.form-check {
 /* Google calendar tab style for generated tabs */
 .calendar-container {
   position: relative;
-}
-
-@font-face {
-  font-family: "Google Sans";
-  font-weight: 300 400;
-  src: url("https://sp3eder.github.io/Google-Sans-Font/GoogleSans-Regular.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "Google Sans";
-  font-weight: 500 700;
-  src: url("https://sp3eder.github.io/Google-Sans-Font/GoogleSans-Medium.ttf") format("truetype");
 }
 
 /* Full cover for the iframe feedback button */
@@ -212,51 +244,28 @@ main p, main p.form-check {
   z-index: 2;
 }
 
-/* Footer */
-footer {
-  color: rgba(0, 0, 0, .5);
-  font-size: small;
-}
-
-footer p {
-  margin-bottom: 0.3rem;
-}
-
-footer .form-ico, footer .social-ico {
-  font-size: 24px;
-}
-
-footer .form-ico {
-  color: #ff606d;
-}
-
-footer .xref-text {
-  vertical-align: 4px;
-}
-
 /* Add event form*/
-#addEventForm .modal-dialog {
-  max-width: max-content;
-}
-
 #addEventForm .modal-content {
   background-color: #f6f6f6;
+}
+#addEventForm .modal-dialog {
+  height: calc(100% - 1rem) !important;
+}
+@media (min-width: 576px) {
+  #addEventForm .modal-dialog {
+    height: calc(100% - 3.5rem) !important;
+    max-width: min(95%, 768px);
+  }
 }
 
 @media (prefers-color-scheme: dark) {
   #addEventForm .modal-content {
-    background-color: #0a0a0a;
+    filter: invert(1) hue-rotate(180deg);
   }
-}
 
-#addEventForm .modal-body {
-  padding: 0;
-  padding-bottom: 1rem;
-}
-
-#addEventForm iframe {
-  width: min(650px, 90vw);
-  height: calc(100vh - 10rem);
+  .browser-forced-dark-mode #addEventForm .modal-content iframe {
+    filter: invert(1) hue-rotate(-180deg);
+  }
 }
 
 /* Narrow view */
@@ -300,10 +309,15 @@ footer .xref-text {
   flex-wrap: wrap;
 }
 
+.controls-calendar-switches .form-switch .form-check-input {
+  margin-left: -2em;
+  width: 28px;
+}
+
 /* Fullscreen view for the app */
 .fullscreen .background-image,
 .fullscreen header,
-.fullscreen footer,
+.fullscreen #menu,
 .fullscreen main > p,
 .fullscreen .controls-calendar-count {
   display: none;
