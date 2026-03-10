@@ -28,24 +28,21 @@ a:hover {
   z-index: -1;
 }
 
+/* Main menu styling */
 #menu {
   z-index: 10;
 }
-
 #menu .navbar-toggler {
   color: #000;
 }
-
 #menu, #menu .offcanvas {
   background-color: #f0f4f9;
 }
-
 @media (prefers-color-scheme: dark) {
   #menu, #menu .offcanvas {
     background-color: #080c11;
   }
 }
-
 @media (min-width: 48em) {
   #menu {
     background-color: #0000004f;
@@ -61,15 +58,12 @@ a:hover {
     --bs-navbar-active-color: #fff;
   }
 }
-
 #navbarSocial {
   font-size: 24px;
 }
-
 #menu .form-ico {
   color: #ff606d;
 }
-
 #menu .xref-text {
   vertical-align: 4px;
 }
@@ -83,7 +77,6 @@ a:hover {
   text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
   z-index: 0;
 }
-
 @media (min-width: 48em) {
   .cover-container {
     border-radius: 1rem;
@@ -91,7 +84,6 @@ a:hover {
     z-index: 20;
   }
 }
-
 @media (prefers-color-scheme: dark) {
   .cover-container {
     box-shadow: 0 0 1rem rgba(255, 255, 255, .5);
@@ -180,7 +172,7 @@ main p, main p.form-check {
   pointer-events: auto;
 }
 
-/* Wide view button */
+/* View selector button */
 .controls-calendar-view .dropdown-toggle {
   background-color: #f0f4f9;
   border: #747775 solid 1px;
@@ -209,7 +201,6 @@ main p, main p.form-check {
   margin-left: 8px;
   vertical-align: .2em;
 }
-
 .controls-calendar-view .dropdown-menu {
   background-color: #e5edf6;
   border: #0000 solid 1px;
@@ -219,7 +210,6 @@ main p, main p.form-check {
   line-height: 16px;
   min-width: 112px;
 }
-
 .controls-calendar-view .dropdown-item {
   color: #1f1f1f;
   padding: 12px;
@@ -231,44 +221,6 @@ main p, main p.form-check {
 .controls-calendar-view .dropdown-item:active {
   background-color: #b3c3cf;
 }
-
-.controls-calendar-count {
-  font-family: "Google Sans",Roboto,Arial,sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  pointer-events: none;
-  position: absolute;
-  text-shadow: none;
-  top: 570px;
-  width: 100%;
-  z-index: 2;
-}
-
-/* Add event form*/
-#addEventForm .modal-content {
-  background-color: #f6f6f6;
-}
-#addEventForm .modal-dialog {
-  height: calc(100% - 1rem) !important;
-}
-@media (min-width: 576px) {
-  #addEventForm .modal-dialog {
-    height: calc(100% - 3.5rem) !important;
-    max-width: min(95%, 768px);
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  #addEventForm .modal-content {
-    filter: invert(1) hue-rotate(180deg);
-  }
-
-  .browser-forced-dark-mode #addEventForm .modal-content iframe {
-    filter: invert(1) hue-rotate(-180deg);
-  }
-}
-
-/* Narrow view */
 @media (max-width: 720px) {
   .controls-calendar-view {
     position: absolute;
@@ -276,7 +228,6 @@ main p, main p.form-check {
     top: 6px;
     height: 48px;
   }
-
   .controls-calendar-view button.dropdown-toggle {
     border: transparent 0px;
     border-radius: 0;
@@ -294,32 +245,68 @@ main p, main p.form-check {
   .controls-calendar-view .feedback-cover {
     display: none;
   }
-
   .controls-calendar-view .dropdown-toggle:hover,
   .controls-calendar-view .dropdown-toggle:active {
     background-color: #f0f4f9;
   }
+}
 
+/* Calendar event counter below the main calendar */
+.controls-calendar-count {
+  font-family: "Google Sans",Roboto,Arial,sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  pointer-events: none;
+  position: absolute;
+  text-shadow: none;
+  bottom: 6px;
+  width: 100%;
+  z-index: 2;
+}
+/* Using 1-rem padding and Google switches layout from 626px. */
+@media (min-width: calc(626px + 2rem)) {
   .controls-calendar-count {
-    top: 576px;
+    bottom: 12px;
   }
 }
 
+/* Calendar switches layout */
 .controls-calendar-switches {
   flex-wrap: wrap;
 }
-
 .controls-calendar-switches .form-switch .form-check-input {
   margin-left: -2em;
   width: 28px;
+}
+
+/* Add event form*/
+#addEventForm .modal-content {
+  background-color: #f6f6f6;
+}
+#addEventForm .modal-dialog {
+  height: calc(100% - 1rem) !important;
+}
+@media (min-width: 576px) {
+  #addEventForm .modal-dialog {
+    height: calc(100% - 3.5rem) !important;
+    max-width: min(95%, 768px);
+  }
+}
+@media (prefers-color-scheme: dark) {
+  #addEventForm .modal-content {
+    filter: invert(1) hue-rotate(180deg);
+  }
+
+  .browser-forced-dark-mode #addEventForm .modal-content iframe {
+    filter: invert(1) hue-rotate(-180deg);
+  }
 }
 
 /* Fullscreen view for the app */
 .fullscreen .background-image,
 .fullscreen header,
 .fullscreen #menu,
-.fullscreen main > p,
-.fullscreen .controls-calendar-count {
+.fullscreen main > p {
   display: none;
 }
 
@@ -329,6 +316,7 @@ main p, main p.form-check {
 }
 
 .fullscreen main,
+.fullscreen .calendar-frame-container,
 .fullscreen .calendar-container,
 .fullscreen .calendar-container iframe {
   display: flex;
