@@ -61,8 +61,11 @@ a:hover {
 #navbarSocial {
   font-size: 24px;
 }
-#menu .form-ico, #menu .help-ico {
+#navbarSocial button {
   color: #ff606d;
+}
+#navbarSocial button:hover {
+  color: #ce4d58;
 }
 #menu .xref-text {
   vertical-align: 4px;
@@ -192,7 +195,7 @@ main p, main p.form-check {
   .fullscreen .controls-calendar-view .dropdown-toggle {
     height: 28px;
   }
-  .controls-calendar-view::after {
+  .fullscreen .controls-calendar-view::after {
     position: absolute;
     background-color: #f0f4f9;
     content: " ";
@@ -240,7 +243,10 @@ main p, main p.form-check {
 .controls-calendar-view .dropdown-item:active {
   background-color: #b3c3cf;
 }
-@media (max-width: 720px) {
+@media (max-width: calc(625px + 2rem)) {
+  .date-tour-helper {
+    height: 30px;
+  }
   .controls-calendar-view {
     position: absolute;
     right: 4px;
@@ -319,7 +325,24 @@ main p, main p.form-check {
   --bs-btn-active-border-color: #abababd8;
 }
 
-/* Add event form*/
+/* UI Tour */
+.date-tour-helper {
+  max-width: 356px;
+  min-width: 200px;
+  pointer-events: none;
+  position: absolute;
+  top: 10px; left: 0;
+  width: 60%; height: 36px; /* The date selector's largest size */
+  z-index: -1;
+}
+@media (prefers-color-scheme: dark) {
+  .introjs-tooltip, .introjs-helperLayer {
+    box-shadow: 0 3px 30px #ffffff;
+    filter: invert(1) hue-rotate(180deg);
+  }
+}
+
+/* Add event form */
 #addEventForm .modal-content {
   background-color: #f6f6f6;
 }

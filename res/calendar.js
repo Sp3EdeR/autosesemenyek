@@ -9,6 +9,7 @@
 const calendars = {
     init: null,
     openSubscription: null,
+    startTour: null
 };
 
 (function() {
@@ -157,6 +158,7 @@ class Calendars {
         this._container.append($(`
 <div class="calendar-frame-container position-relative">
   <iframe title="Naptár" class="d-block overflow-hidden m-0">Naptár betöltése...</iframe>
+  <div class="date-tour-helper"></div>
   <div class="feedback-cover"></div>
   <div class="controls-calendar-view">
       <button class="dropdown-toggle" type="button" id="viewButton" data-bs-toggle="dropdown" aria-expanded="false" tabindex="1">
@@ -170,7 +172,7 @@ class Calendars {
   </div>
   <div class="controls-calendar-count rounded-circle" id="eventsCount"></div>
 </div>
-<div>
+<div id="calendar-switch-container">
   <a class="d-block d-sm-none btn p-0" role="button" data-bs-toggle="collapse" href="#calendar-switches" aria-expanded="false" aria-controls="calendar-switches">
     <i class="fa-solid fa-caret-up"></i><i class="fa-solid fa-caret-down d-none"></i>
   </a>
@@ -229,13 +231,43 @@ class Calendars {
 var _calendars = null;
 calendars.init = data => { _calendars = new Calendars(document.currentScript, data); };
 calendars.openSubscription = () => { _calendars?.openSubscription(); };
+calendars.startTour = () => {
+    const offcanvasElem = $('#menu .offcanvas');
+    const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasElem);
+    offcanvas.hide();
+
+    const newEventSelector = '#menu button:has(.fa-calendar-plus)';
+    const tour = introJs.tour().setOptions({
+        steps: [
+            { element: '.date-tour-helper', title: 'Dátumválasztó', intro: 'Itt válthatsz másik dátum megjelenítésére.' },
+            { element: '.controls-calendar-view > button', title: 'Naptár Nézete', intro: 'Itt változtathatod meg a naptár nézetét.' },
+            { element: '.calendar-frame-container', title: 'Esemény Részletei', intro: 'Kattints egy eseményre, hogy további információkat olvashass róla.' },
+            { element: '#calendar-switch-container', title: 'Esemény Típus Szűrők', intro: 'Itt jeleníthetsz meg vagy rejthetsz el esemény típusokat.' },
+            { title: 'Google Naptárba Vétel', intro: 'Nem muszáj mindig ide látogatnod, <a href="#" onclick="calendars.openSubscription(); event.preventDefault();">kattints ide</a>, hogy a Google Naptáradból is követhesd az eseményeket.' },
+            { element: newEventSelector, title: 'Új Esemény', intro: 'Kattints ide, hogy új eseményt felvételést javasold nekünk.' }
+        ].filter(step => !step.element || $(step.element).length),
+        language: 'hu-HU',
+        nextLabel: 'Tovább',
+        prevLabel: 'Vissza',
+        doneLabel: 'Kész'
+    });
+    const newEventButton = document.querySelector(newEventSelector);
+    tour.onchange(targetElement => {
+        if (targetElement === newEventButton && window.innerWidth <= offcanvasElem.offset().left)
+            offcanvas.show();
+        else
+            offcanvas.hide();
+    });
+    tour.onStart(() => offcanvasElem.on('shown.bs.offcanvas', () => tour?.refresh()));
+    tour.onExit(() => offcanvasElem.off('shown.bs.offcanvas'));
+    tour.start();
+};
 
 // Hide popups when clicking into the iframe, or away from the tab
 $(window).on('blur', () => $('.dropdown-toggle').dropdown('hide'));
 
 // Samsung Browser forced dark mode workaround
 if (navigator.userAgent.match(/SamsungBrowser/)) {
-    $('body').addClass('samsung-browser');
     // Detect forced dark mode by rendering a white image and checking pixel color
     const img = new Image();
     img.onload = function() {

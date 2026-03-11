@@ -36,12 +36,14 @@
     gtag('config', 'G-X1PD6MH5YC');
   </script>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha256-2FMn2Zx6PuH5tdBQDRNwrOo60ts5wWPC9R8jK67b3t4=" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans@5.2.10/index.css" integrity="sha256-DgDXFQXB8ZVeD/0eW8nW7FEA5BmUwx/vn6XTUR4z7to=" crossorigin="anonymous" referrerpolicy="no-referrer">
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:opsz@17..18&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:opsz@17..18&display=swap" rel="stylesheet" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha256-2FMn2Zx6PuH5tdBQDRNwrOo60ts5wWPC9R8jK67b3t4=" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@8.3.2/minified/introjs.min.css" integrity="sha256-h/GJRwe+EThjx0n677zN2M7ADzfYPppkIjRHk+tloCQ=" crossorigin="anonymous" referrerpolicy="no-referrer">
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/intro.js@8.3.2/minified/intro.min.js" integrity="sha256-imLq12Sakp9z7vm8/vjEfoXWR+85IDOcyVxdB3Fe1DI=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <script src="res/calendar.js"></script>
   <link href="res/style.css" rel="stylesheet">
@@ -58,12 +60,12 @@
       initMenu('events-tab', `
         <ul id="navbarSocial" class="navbar-nav mt-5 mt-sm-0 ms-sm-auto py-sm-2 pe-sm-3">
           <li class="nav-item mx-2">
-            <a href="#" data-bs-toggle="modal" data-bs-target="#addEventForm" class="form-ico me-2" title="Esemény hozzáadása">
+            <button class="bg-transparent border-0 p-0 me-2" data-bs-toggle="modal" data-bs-target="#addEventForm" title="Esemény hozzáadása" aria-label="Esemény hozzáadása">
               <i class="fa-regular fa-calendar-plus"></i>
-            </a>
-            <a href="#" class="help-ico" title="Naptár használata">
+            </button>
+            <button class="bg-transparent border-0 p-0" id="help-button" title="Naptár használata" aria-label="Naptár használata">
               <i class="fa-regular fa-circle-question"></i>
-            </a>
+            </button>
           </li>
           <li class="nav-item mx-2">
             <a href="https://www.facebook.com/autosesemenyek" target="_blank" rel="noopener noreferrer" class="social-ico me-2" title="Facebook oldal">
@@ -73,7 +75,10 @@
               <i class="fa-brands fa-facebook-messenger"></i>
             </a>
           </li>
-        </ul>`);
+        </ul>`)
+      .then(() => { $('#help-button').click(event => {
+        calendars.startTour();
+      }); });
     </script>
     <div class="cover-container position-relative p-3 w-100 mx-auto d-flex flex-column">
       <header class="mb-0">
