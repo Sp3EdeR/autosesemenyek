@@ -83,13 +83,23 @@ class CalendarStats {
 
 class CalendarSwitches {
     constructor(container) {
-        this._container = container;
+        this._switchContainer = container.find('.controls-calendar-switches');
+        const toggle = container.find('[data-bs-toggle="collapse"][href="#calendar-switches"]');
+        this._caretUp = toggle.find('.fa-caret-up');
+        this._caretDown = toggle.find('.fa-caret-down');
         this._updateCallback = null;
-        container.on('change', event => {
+        this._switchContainer.on('change', event => {
             const switchCtrl = $(event.target);
             const id = switchCtrl.attr('id');
             pageStorage.setItem(id, switchCtrl.prop('checked'));
             this._updateCallback?.();
+        });
+
+        this._switchContainer.on('show.bs.collapse', () => {
+            this._syncCaretState(true);
+        });
+        this._switchContainer.on('hide.bs.collapse', () => {
+            this._syncCaretState(false);
         });
     }
 
@@ -102,16 +112,19 @@ class CalendarSwitches {
                 props.on != false :
                 pageStorage.getItem(id) == 'true';
 
-            this._container.append($(`
+            this._switchContainer.append($(`
 <div class="form-check form-switch d-inline-block">
   <input type="checkbox" role="switch" switch class="form-check-input" id="${id}" value="${name}" ${isEnabled ? 'checked' : ''}>
   <label class="form-check-label" for="${id}" style="color: ${props.clr}">${name}</label>
 </div>
 `));
         }
-        this._switches = this._container.find('input');
+        this._switches = this._switchContainer.find('input');
         if (this._switches.length)
-            this._container.removeClass('d-none');
+            this._switchContainer.removeClass('d-none');
+
+        this._updateCollapse();
+        $(window).on('resize', () => this._updateCollapse());
 
         this._updateCallback?.();
     }
@@ -121,6 +134,21 @@ class CalendarSwitches {
     }
 
     onUpdate(onUpdate) { this._updateCallback = onUpdate; }
+
+    _updateCollapse() {
+        const expand = 576 <= $(window).width();
+        if (this._expanded === expand)
+            return;
+
+        this._switchContainer.toggleClass('show', expand);
+        this._syncCaretState(expand);
+        this._expanded = expand;
+    }
+
+    _syncCaretState(isExpanded) {
+        this._caretUp.toggleClass('d-none', isExpanded);
+        this._caretDown.toggleClass('d-none', !isExpanded);
+    }
 }
 
 class Calendars {
@@ -142,7 +170,12 @@ class Calendars {
   </div>
   <div class="controls-calendar-count rounded-circle" id="eventsCount"></div>
 </div>
-<div class="controls-calendar-switches d-none p-0 mx-0"></div>
+<div>
+  <a class="d-block d-sm-none btn p-0" role="button" data-bs-toggle="collapse" href="#calendar-switches" aria-expanded="false" aria-controls="calendar-switches">
+    <i class="fa-solid fa-caret-up"></i><i class="fa-solid fa-caret-down d-none"></i>
+  </a>
+  <div class="controls-calendar-switches collapse d-none p-0 mx-0 mt-2 mt-sm-0" id="calendar-switches"></div>
+</div>
 `));
 
         this._calendarFrame = this._container.find('iframe').first();
@@ -157,7 +190,7 @@ class Calendars {
         this._stats = new CalendarStats();
         this._stats.onStatsLoaded(() => this._updateStats());
 
-        this._switches = new CalendarSwitches(this._container.find('.controls-calendar-switches'));
+        this._switches = new CalendarSwitches(this._container.find('div:has(>.controls-calendar-switches)'));
         this._switches.onUpdate(() => this._update());
         this._switches.init(data);
     }

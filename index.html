@@ -52,16 +52,21 @@
 </head>
 
 <body class="position-absolute w-100 h-100 m-0 text-center">
-  <div class="background-image overflow-hidden"></div>
+  <div class="background-image"></div>
   <div class="d-flex flex-column w-100 h-100">
     <script>
       initMenu('events-tab', `
         <ul id="navbarSocial" class="navbar-nav mt-5 mt-sm-0 ms-sm-auto py-sm-2 pe-sm-3">
-          <li class="nav-item">
-            <a href="#" data-bs-toggle="modal" data-bs-target="#addEventForm" class="form-ico pe-1" title="Esemény hozzáadása">
+          <li class="nav-item mx-2">
+            <a href="#" data-bs-toggle="modal" data-bs-target="#addEventForm" class="form-ico me-2" title="Esemény hozzáadása">
               <i class="fa-regular fa-calendar-plus"></i>
             </a>
-            <a href="https://www.facebook.com/autosesemenyek" target="_blank" rel="noopener noreferrer" class="social-ico mx-2" title="Facebook oldal">
+            <a href="#" class="help-ico" title="Naptár használata">
+              <i class="fa-regular fa-circle-question"></i>
+            </a>
+          </li>
+          <li class="nav-item mx-2">
+            <a href="https://www.facebook.com/autosesemenyek" target="_blank" rel="noopener noreferrer" class="social-ico me-2" title="Facebook oldal">
               <i class="fa-brands fa-facebook"></i>
             </a>
             <a href="https://m.me/autosesemenyek" target="_blank" rel="noopener noreferrer" class="social-ico" title="Messenger chat">
@@ -72,11 +77,11 @@
     </script>
     <div class="cover-container position-relative p-3 w-100 mx-auto d-flex flex-column">
       <header class="mb-0">
-        Autós Események Naptára: márkafüggetlen találkozók, pályanapok, versenyek, börzék
+        Autós Események Naptára<span class="d-none d-sm-inline">: márkafüggetlen találkozók, pályanapok, versenyek, börzék</span>
       </header>
 
       <main class="inner cover">
-        <div class="calendar-container">
+        <div class="calendar-container position-relative">
           <script>
             calendars.init({
               'Autó': {
@@ -117,8 +122,6 @@
             });
           </script>
         </div>
-        <p>A dátumválasztóval nézhetsz későbbi eseményeket. A jobb-felső gombbal nézetet válthatsz. Kattints az eseményre további infókhoz.</p>
-        <p>Kövesd az eseményeket <a href="#" onclick="calendars.openSubscription(); event.preventDefault();">a Google naptáradban</a>, hogy mindig naprakész lehess!</p>
       </main>
     </div>
   </div>

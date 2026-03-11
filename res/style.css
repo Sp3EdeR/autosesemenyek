@@ -23,8 +23,8 @@ a:hover {
   box-shadow: inset 0 0 10rem rgba(0, 0, 0, 1);
   inset: 0;
   position: fixed;
+  overflow: hidden;
   width: 100vw; height: 100vh;
-  width: 100svw; height: 100svh;
   z-index: -1;
 }
 
@@ -43,7 +43,7 @@ a:hover {
     background-color: #080c11;
   }
 }
-@media (min-width: 48em) {
+@media (min-width: 768px) {
   #menu {
     background-color: #0000004f;
     box-shadow: 0 0 10px #00000080;
@@ -61,27 +61,51 @@ a:hover {
 #navbarSocial {
   font-size: 24px;
 }
-#menu .form-ico {
+#menu .form-ico, #menu .help-ico {
   color: #ff606d;
 }
 #menu .xref-text {
   vertical-align: 4px;
 }
 
+/* Main layout */
+main,
+.calendar-frame-container,
+.calendar-container,
+.calendar-container iframe {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
 .cover-container {
   background-color: #f0f4f9;
   box-shadow: 0 0 1rem rgba(0, 0, 0, .5);
   color: #212529;
   flex: 1 1 auto;
-  max-width: 48em;
+  max-width: 768px;
   text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
   z-index: 0;
 }
-@media (min-width: 48em) {
+@media (min-width: 768px) {
+  main,
+  .calendar-frame-container,
+  .calendar-container {
+    display: block;
+  }
+  .calendar-container iframe {
+    display: block;
+    width: 100%;
+    height: max(600px, 80vh);
+  }
   .cover-container {
     border-radius: 1rem;
     flex: none;
     z-index: 20;
+  }
+}
+@media (min-width: 80em) {
+  .cover-container {
+    max-width: 60em;
   }
 }
 @media (prefers-color-scheme: dark) {
@@ -95,36 +119,25 @@ a:hover {
   .background-image {
     filter: brightness(0.5);
   }
-
   .browser-forced-dark-mode .calendar-container iframe {
     filter: invert(1) hue-rotate(-180deg);
   }
 }
 
-header {
-  padding: 0 12px;
+/* Fullscreen layout for the app */
+.fullscreen header,
+.fullscreen #menu {
+  display: none;
+}
+.fullscreen .cover-container {
+  max-width: 100%;
 }
 
+/* Page elements */
 header {
   margin-bottom: 2rem;
+  padding: 0 12px;
   position: relative;
-}
-
-.masthead-brand {
-  margin-bottom: 0;
-  margin-right: .5rem;
-}
-
-@media (min-width: 48em) {
-  .masthead-brand {
-    float: left;
-  }
-}
-
-@media (min-width: 80em) {
-  .cover-container {
-    max-width: 60em;
-  }
 }
 
 .cover .btn-lg {
@@ -132,18 +145,8 @@ header {
   font-weight: 700;
 }
 
-main iframe {
-  width: 100%;
-  height: 600px;
-}
-
 main p, main p.form-check {
   margin-bottom: 0.5rem;
-}
-
-/* Google calendar tab style for generated tabs */
-.calendar-container {
-  position: relative;
 }
 
 /* Full cover for the iframe feedback button */
@@ -167,11 +170,9 @@ main p, main p.form-check {
   text-shadow: none;
   z-index: 2;
 }
-
 .controls-calendar-view > * {
   pointer-events: auto;
 }
-
 /* View selector button */
 .controls-calendar-view .dropdown-toggle {
   background-color: #f0f4f9;
@@ -185,6 +186,24 @@ main p, main p.form-check {
   padding-inline-start: 26px;
   padding-inline-end: 20px;
   transition: 0.2s;
+}
+/* 526px is only an estimate for button collapse */
+@media (max-height: 526px) {
+  .fullscreen .controls-calendar-view .dropdown-toggle {
+    height: 28px;
+  }
+  .controls-calendar-view::after {
+    position: absolute;
+    background-color: #f0f4f9;
+    content: " ";
+    width: 30px;
+    height: 30px;
+    display: block;
+    top: -4px;
+    right: -7px;
+    z-index: -1;
+    pointer-events: all;
+  }
 }
 .controls-calendar-view .button-short {
   display: none;
@@ -278,6 +297,27 @@ main p, main p.form-check {
   margin-left: -2em;
   width: 28px;
 }
+@keyframes collapse-toggle-text-color {
+  0%,
+  100% {
+    color: var(--bs-btn-color);
+  }
+  50% {
+    color: transparent;
+  }
+}
+.btn[data-bs-toggle="collapse"]:has(+ .controls-calendar-switches) {
+  height: 1em;
+  animation: collapse-toggle-text-color 1s ease-in-out infinite;
+  line-height: 1;
+  overflow: hidden;
+  --bs-btn-bg: #e3e3e3;
+  --bs-btn-border-color: #e3e3e3d8;
+  --bs-btn-hover-bg: #c7c7c7;
+  --bs-btn-hover-border-color: #c7c7c7d8;
+  --bs-btn-active-bg: #ababab;
+  --bs-btn-active-border-color: #abababd8;
+}
 
 /* Add event form*/
 #addEventForm .modal-content {
@@ -299,55 +339,5 @@ main p, main p.form-check {
 
   .browser-forced-dark-mode #addEventForm .modal-content iframe {
     filter: invert(1) hue-rotate(-180deg);
-  }
-}
-
-/* Fullscreen view for the app */
-.fullscreen .background-image,
-.fullscreen header,
-.fullscreen #menu,
-.fullscreen main > p {
-  display: none;
-}
-
-.fullscreen .cover-container {
-  margin: 0 !important;
-  max-width: 100%;
-}
-
-.fullscreen main,
-.fullscreen .calendar-frame-container,
-.fullscreen .calendar-container,
-.fullscreen .calendar-container iframe {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-}
-
-.fullscreen main iframe {
-  height: 100px;
-}
-
-.fullscreen .controls-calendar-switches {
-  margin: auto;
-}
-
-/* 526px is only an estimate for button collapse */
-@media (max-height: 526px) {
-  .fullscreen .controls-calendar-view .dropdown-toggle {
-    height: 28px;
-  }
-
-  .controls-calendar-view::after {
-    position: absolute;
-    background-color: #f0f4f9;
-    content: " ";
-    width: 30px;
-    height: 30px;
-    display: block;
-    top: -4px;
-    right: -7px;
-    z-index: -1;
-    pointer-events: all;
   }
 }

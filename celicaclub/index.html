@@ -53,69 +53,64 @@
 </head>
 
 <body class="position-absolute w-100 h-100 m-0 text-center">
-  <div class="background-image overflow-hidden"></div>
+  <div class="background-image"></div>
   <div class="d-flex flex-column w-100 h-100">
     <script>
       initMenu(undefined, `
         <ul id="navbarSocial" class="navbar-nav mt-5 mt-sm-0 ms-sm-auto py-sm-2 pe-sm-3">
-          <li class="nav-item">
-            <a href="#" data-bs-toggle="modal" data-bs-target="#addEventForm" class="form-ico pe-1" title="Esemény hozzáadása">
-              <i class="fa-regular fa-calendar-plus"></i>
+          <li class="nav-item mx-2">
+            <a href="#" class="help-ico" title="Naptár használata">
+              <i class="fa-regular fa-circle-question"></i>
             </a>
-            <a href="https://www.facebook.com/autosesemenyek" target="_blank" rel="noopener noreferrer" class="social-ico mx-2" title="Facebook oldal">
+            <a href="https://www.facebook.com/groups/magyarcelicaclub" target="_blank" rel="noopener noreferrer" class="social-ico" title="Facebook oldal">
               <i class="fa-brands fa-facebook"></i>
-            </a>
-            <a href="https://m.me/autosesemenyek" target="_blank" rel="noopener noreferrer" class="social-ico" title="Messenger chat">
-              <i class="fa-brands fa-facebook-messenger"></i>
             </a>
           </li>
         </ul>`);
     </script>
     <div class="cover-container position-relative p-3 w-100 mx-auto d-flex flex-column">
       <header class="mb-0">
-        Celica Club Eseménynaptár: klubos autós találkozók, és egyéb események
-    </header>
+        Celica Club Eseménynaptár<span class="d-none d-sm-inline">: klubos autós találkozók, és egyéb események</span>
+      </header>
 
-    <main class="inner cover">
-      <div class="calendar-container">
-        <script>
-          calendars.init({
-            'Celica Club': {
-              'cals': [
-                { 'id': 'lgjsqr60r3fnsjuc6mv4ogd2hs@group.calendar.google.com', 'clr': '#4285F4' }
-              ],
-              'clr': '#2952A3',
-              'hidden': true
-            },
-            'Autó': {
-              'cals': [
-                { 'id': '6ed4253a01425b241902ebb68e9fdada28e89336654eed1bd54ccd8139ce1276@group.calendar.google.com', 'clr': '#616161' }, // Magyar Autós Események
-                { 'id': 'e0c2f5826251b22f92bc0b0856a292bc700c14b7ac90f8d9951657c82c545cdb@group.calendar.google.com', 'clr': '#6A6A6A' }  // Magyar Autós Események ICS
-              ],
-              'clr': '#616161'
-            },
-            'Pályanap': {
-              'cals': [
-                { 'id': '87bde2928c16f337ec9a4a19eaa4fc4f58725459b8250d01b59be418036a87ee@group.calendar.google.com', 'clr': '#0B8043' }, // Pályanapok ICS
-                { 'id': 'e064ca1a0a64e52135aff7eeef8cd32d525043510206c994cf814762075e7777@group.calendar.google.com', 'clr': '#0C8747' }  // Pályanapok Web
-              ],
-              'clr': '#0B8043'
-            },
-            'Verseny': {
-              'cals': [
-                { 'id': 'e2c1f0f733fdf9809b81894ca9bda56e09fea2fee9385d715b7fdeb60fc029ae@group.calendar.google.com', 'clr': '#B1365F' }, // Magyar Autós Versenynaptár
-                { 'id': 'd2ac46db87793c44739589a4074e863ad3b90bc8375b735ffc76748edca4f9ea@group.calendar.google.com', 'clr': '#B63D66' }, // Magyar Autós Versenynaptár ICS
-                { 'id': '2f729c40d69ed7770998b85d7a4551f9693f4020c5ae82a46683e5f577f72521@group.calendar.google.com', 'clr': '#AD335A' }, // Magyar Autós Versenynaptár Web
-                { 'id': '29b1b2c34ddb5b701b336076af1feed962c8fd42c21cc6403e347d40829bfb0b@group.calendar.google.com', 'clr': '#BC426C' }  // MNASZ Versenynaptár
-              ],
-              'clr': '#B1365F'
-            }
-          });
-        </script>
-      </div>
-      <p>A dátumválasztóval nézhetsz későbbi eseményeket. A jobb-felső gombbal nézetet válthatsz. Kattints az eseményre további infókhoz.</p>
-        <p>Kövesd az eseményeket <a href="#" onclick="calendars.openSubscription(); event.preventDefault();">a Google naptáradban</a>, hogy mindig naprakész lehess!</p>
-    </main>
+      <main class="inner cover">
+        <div class="calendar-container position-relative">
+          <script>
+            calendars.init({
+              'Celica Club': {
+                'cals': [
+                  { 'id': 'lgjsqr60r3fnsjuc6mv4ogd2hs@group.calendar.google.com', 'clr': '#4285F4' }
+                ],
+                'clr': '#2952A3',
+                'hidden': true
+              },
+              'Autó': {
+                'cals': [
+                  { 'id': '6ed4253a01425b241902ebb68e9fdada28e89336654eed1bd54ccd8139ce1276@group.calendar.google.com', 'clr': '#616161' }, // Magyar Autós Események
+                  { 'id': 'e0c2f5826251b22f92bc0b0856a292bc700c14b7ac90f8d9951657c82c545cdb@group.calendar.google.com', 'clr': '#6A6A6A' }  // Magyar Autós Események ICS
+                ],
+                'clr': '#616161'
+              },
+              'Pályanap': {
+                'cals': [
+                  { 'id': '87bde2928c16f337ec9a4a19eaa4fc4f58725459b8250d01b59be418036a87ee@group.calendar.google.com', 'clr': '#0B8043' }, // Pályanapok ICS
+                  { 'id': 'e064ca1a0a64e52135aff7eeef8cd32d525043510206c994cf814762075e7777@group.calendar.google.com', 'clr': '#0C8747' }  // Pályanapok Web
+                ],
+                'clr': '#0B8043'
+              },
+              'Verseny': {
+                'cals': [
+                  { 'id': 'e2c1f0f733fdf9809b81894ca9bda56e09fea2fee9385d715b7fdeb60fc029ae@group.calendar.google.com', 'clr': '#B1365F' }, // Magyar Autós Versenynaptár
+                  { 'id': 'd2ac46db87793c44739589a4074e863ad3b90bc8375b735ffc76748edca4f9ea@group.calendar.google.com', 'clr': '#B63D66' }, // Magyar Autós Versenynaptár ICS
+                  { 'id': '2f729c40d69ed7770998b85d7a4551f9693f4020c5ae82a46683e5f577f72521@group.calendar.google.com', 'clr': '#AD335A' }, // Magyar Autós Versenynaptár Web
+                  { 'id': '29b1b2c34ddb5b701b336076af1feed962c8fd42c21cc6403e347d40829bfb0b@group.calendar.google.com', 'clr': '#BC426C' }  // MNASZ Versenynaptár
+                ],
+                'clr': '#B1365F'
+              }
+            });
+          </script>
+        </div>
+      </main>
     </div>
   </div>
 </body>
