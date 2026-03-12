@@ -253,7 +253,8 @@ calendars.startTour = () => {
     });
     const newEventButton = document.querySelector(newEventSelector);
     tour.onchange(targetElement => {
-        if (targetElement === newEventButton && window.innerWidth <= offcanvasElem.offset().left)
+        // The menu has navbar-expand-sm (576px). Only show the offcanvas if it is not expanded.
+        if (targetElement === newEventButton && !window.matchMedia('(min-width: 576px)').matches)
             offcanvas.show();
         else
             offcanvas.hide();
