@@ -115,7 +115,7 @@ class CalendarSwitches {
 
             this._switchContainer.append($(`
 <div class="form-check form-switch d-inline-block">
-  <input type="checkbox" role="switch" switch class="form-check-input" id="${id}" value="${name}" ${isEnabled ? 'checked' : ''}>
+  <input type="checkbox" role="switch" switch class="form-check-input" id="${id}" value="${name}" style="--calendar-switch-color: ${props.clr};" ${isEnabled ? 'checked' : ''}>
   <label class="form-check-label" for="${id}" style="color: ${props.clr}">${name}</label>
 </div>
 `));

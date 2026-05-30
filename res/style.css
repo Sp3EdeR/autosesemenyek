@@ -303,6 +303,14 @@ main p, main p.form-check {
   margin-left: -2em;
   width: 28px;
 }
+.controls-calendar-switches .form-switch .form-check-input:checked {
+  background-color: var(--calendar-switch-color);
+  border-color: hsl(from var(--calendar-switch-color) h s calc(l - 20));
+}
+.controls-calendar-switches .form-switch .form-check-input:focus {
+  border-color: hsl(from var(--calendar-switch-color) h s calc(l - 20));
+  box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--calendar-switch-color) 25%, transparent);
+}
 @keyframes collapse-toggle-text-color {
   0%,
   100% {
