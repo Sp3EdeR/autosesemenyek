@@ -22,19 +22,22 @@ body:
   - type: dropdown
     id: event-type
     attributes:
-      label: A márkafüggetlen esemény típusa
+      label: Az esemény típusa
       description: |
-        Az esemény típusa. Csak márkafüggetlen eseményeket követünk!
+        Az esemény típusa.
       options:
-        - Autós találkozó
-        - Autós fesztivál
-        - Autós/veterános túra (nem versenyek nem játszanak)
-        - Autós vagy tuning kiállítás
-        - Veteránbörze
-        - Nyílt versenypályanap
+        - Autós/motoros/kamionos találkozó
+        - Autós/motoros/kamionos fesztivál
+        - Autós/motoros/veterán túra
+        - Autós/motoros kiállítás
+        - Nyílt autós/motoros versenypályanap
+        - Autó/motor/kamion verseny
+        - Autós/motoros (veterán) börze vagy piac
         - Tesztvezetés esemény
         - Vezetésoktatás esemény
         - Autósmozi
+        - Autós/motoros/monster-truckos kaszkadőr bemutató
+        - Kisautó vagy autómodell börze
     validations:
       required: true
   - type: textarea
