@@ -71,13 +71,35 @@ class CalendarStats {
     }
     onStatsLoaded(onStatsLoaded) { this._onStatsLoaded = onStatsLoaded; }
     _updateStats() {
-        $.ajax("https://sp3eder.github.io/autosesemenyek-meta/stats.json", { dataType: "json" })
-            .done(stats => {
-                Object.assign(this, stats);
+        $.ajax({
+            url: 'https://docs.google.com/spreadsheets/d/1i_0o2470jbDeX4mbXD4U29wNz-aVjPA2irWM8t-_5T4/gviz/tq?tqx=out:json',
+            dataType: 'json',
+            dataFilter: function(rawResponse) {
+                // Strip the google function wrapper
+                return rawResponse.replace(/^[^\(]*?setResponse\(|\);?\s*$/g, '');
+            },
+            success: stats => {
+                if (!stats || stats.status !== 'ok' || !stats.table || !stats.table.rows)
+                {
+                    console.error('Invalid calendar stats received.', stats);
+                    return;
+                }
+                // Store table data as key-values in this object by the first column
+                Object.assign(this, stats.table.rows.reduce((dict, row) => {
+                    if (row.c && 1 < row.c.length && row.c.every(cell => cell && 'v' in cell))
+                        dict[String(row.c[0].v)] = row.c.slice(1).map(cell => cell.v);
+                    else
+                        console.warn('Invalid calendar stats row received:', row);
+                    return dict;
+                }, {}));
                 this.initialized = true;
                 if (this._onStatsLoaded)
                     this._onStatsLoaded(this);
-            });
+            },
+            error: (_, status, error) => {
+                console.error('Failed to load calendar stats.', status, error);
+            }
+        });
         setTimeout(() => this._updateStats(), 1000 * 60 * 5);
     }
 }
@@ -217,7 +239,7 @@ class Calendars {
             return;
         const calIds = this._selectedCalData.map(d => d.cals).flat().map(c => c.id);
         const eventCount = calIds.reduce(
-            (accumul, id) => accumul + (this._stats[id] ?? 0), 0);
+            (accumul, id) => accumul + (Number((this._stats[id] ?? [0])[0]) || 0), 0);
         $('#eventsCount').html(`&raquo; ${eventCount} esemény`);
     }
     _getSelectedCalIds() {
