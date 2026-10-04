@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <script>
+    if (window === window.top)
+      window.location.replace('../');
+  </script>
+  <title>Autós események térképe</title>
+
+  <!-- 3rd party library CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans@5.2.10/index.css" integrity="sha256-DgDXFQXB8ZVeD/0eW8nW7FEA5BmUwx/vn6XTUR4z7to=" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:opsz@17..18&display=swap" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.88.0/dist/L.Control.Locate.min.css" integrity="sha256-O+3YJj36sHCEz79vulGAW3a86wg5jUdaBjJxZo4RgjU=" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" integrity="sha256-GzSkJVLJbxDk36qko2cnawOGiqz/Y8GsQv/jMTUrx1Q=" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- 3rd party library JS -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-providers@3.0.0/leaflet-providers.js" integrity="sha256-SZMwMOIwpXRGjWgSFT0ljD6zknwdYIhj0vnmRJgpvaA=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.88.0/dist/L.Control.Locate.min.js" integrity="sha256-vSsE9jbyrEMo90soUGSi21VY3RkTEuqRdHSsEqe2iIQ=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.16/dist/purify.min.js" integrity="sha256-LJCptG1kY/JgOKKbaG6CvJHeAf2snVIp58/js2ATTqI=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js" integrity="sha256-Huqxy3eUcaCwqqk92RwusapTfWlvAasF6p2rxV6FJaE=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/hu.js" integrity="sha256-Uns4QLuBeaoJ/hThWHZKiMhkfTm+O1W+L5nFf/qJKog=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- event map codebase and style -->
+  <link rel="stylesheet" href="event-map.css">
+  <script src="event-map.js" defer></script>
+</head>
+<body>
+  <div class="map-toolbar">
+    <details id="date-filter">
+      <summary title="Dátumtartomány kiválasztása">
+        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+        <span id="date-range">Mostantól</span>
+        <i class="fa-solid fa-caret-down" aria-hidden="true"></i>
+      </summary>
+      <form id="date-form">
+        <label for="date-start-display">Kezdet</label> <input id="date-start" type="date">
+        <label for="date-end-display">Vége</label> <input id="date-end" type="date">
+        <button type="reset"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> Minden Esemény</button>
+      </form>
+    </details>
+  </div>
+  <div class="map-warning" role="note">
+    A hiányzó vagy nem azonosítható helyszínű események nem jelennek meg a térképen.
+    A megjelölt helyszínek pontatlanok lehetnek.
+  </div>
+  <main id="map" aria-label="Közelgő események térképe"></main>
+  <footer class="map-footer">
+    <a id="map-subscribe" href="#" title="Hozzáadás a Google Naptárhoz" aria-label="Hozzáadás a Google Naptárhoz">
+      <span>Hozzáadás a Google Naptárhoz</span>
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+    </a>
+    <div id="map-status" role="status" aria-live="polite">Események betöltése...</div>
+  </footer>
+</body>
+</html>

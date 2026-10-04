@@ -6,10 +6,11 @@
  * { 'calendar-name': {'url': 'url-fragment', 'clr': '#clrcode'}, ... }
  */
 
-const calendars = {
+const calendars = window.calendars = {
     init: null,
     openSubscription: null,
-    startTour: null
+    startTour: null,
+    loadMapData: null
 };
 
 (function() {
@@ -74,10 +75,7 @@ class CalendarStats {
         $.ajax({
             url: 'https://docs.google.com/spreadsheets/d/1i_0o2470jbDeX4mbXD4U29wNz-aVjPA2irWM8t-_5T4/gviz/tq?tqx=out:json',
             dataType: 'json',
-            dataFilter: function(rawResponse) {
-                // Strip the google function wrapper
-                return rawResponse.replace(/^[^\(]*?setResponse\(|\);?\s*$/g, '');
-            },
+            dataFilter: stripGoogleResponse,
             success: stats => {
                 if (!stats || stats.status !== 'ok' || !stats.table || !stats.table.rows)
                 {
@@ -186,10 +184,12 @@ class Calendars {
       <button class="dropdown-toggle" type="button" id="viewButton" data-bs-toggle="dropdown" aria-expanded="false" tabindex="1">
         <span class="button-face" data-mode="AGENDA"><i class="fa-solid fa-bars button-short"></i><span class="button-long">Ütemezés</span></span>
         <span class="button-face d-none" data-mode="MONTH"><i class="fa-solid fa-table button-short"></i><span class="button-long">Hónap</span></span>
+        <span class="button-face d-none" data-mode="MAP"><i class="fa-solid fa-map-location-dot button-short"></i><span class="button-long">Térkép</span></span>
       </button>
       <div class="dropdown-menu dropdown-menu-end" aria-labelledby="viewButton">
       <a class="dropdown-item" href="#" id="tab-controller-AGENDA"><i class="fa-solid fa-bars me-2"></i>Ütemezés</a>
       <a class="dropdown-item" href="#" id="tab-controller-MONTH"><i class="fa-solid fa-table me-2"></i>Hónap</a>
+      <a class="dropdown-item" href="#" id="tab-controller-MAP"><i class="fa-solid fa-map-location-dot me-2"></i>Térkép</a>
     </div>
   </div>
   <div class="controls-calendar-count rounded-circle" id="eventsCount"></div>
@@ -203,6 +203,7 @@ class Calendars {
 `));
 
         this._calendarFrame = this._container.find('iframe').first();
+        this._calendarFrame.on('load', () => this._updateMapFilters());
         this._urlBase =
             'https://calendar.google.com/calendar/u/0/embed?height=600&wkst=2&bgcolor=%23eef1f8' +
             '&ctz=Europe%2FBudapest&showTz=0&showPrint=0&showDate=1&showTabs=0&showCalendars=0' +
@@ -224,8 +225,19 @@ class Calendars {
             return;
         window.open('https://calendar.google.com/calendar/r?cid=' + calIds.join('&cid='));
     }
+    /** Switches iframe documents only when needed; map filters preserve its camera and dates. */
     _update() {
         this._selectedCalData = this._switches.selected;
+        const isMap = this._tabs.currentMode == 'MAP';
+        this._container.toggleClass('calendar-map-view', isMap);
+        this._calendarFrame.attr('title', isMap ? 'Eseménytérkép' : 'Naptár');
+        if (isMap) {
+            if (this._calendarFrame.attr('src') != mapUrl)
+                this._calendarFrame.attr('src', mapUrl);
+            else
+                this._updateMapFilters();
+            return;
+        }
 
         let options = '&mode=' + this._tabs.currentMode;
         options = this._selectedCalData.reduce(
@@ -234,6 +246,16 @@ class Calendars {
 
         this._updateStats();
     }
+    /** Passes calendar IDs and marker colors to the same-origin map iframe after it loads. */
+    _updateMapFilters() {
+        if (this._tabs.currentMode != 'MAP' || !this._selectedCalData)
+            return;
+        const frame = this._calendarFrame[0];
+        if (frame.contentDocument?.URL != mapUrl)
+            return;
+        frame.contentWindow.eventMap?.setCalendars(this._selectedCalData.flatMap(data => data.cals));
+    }
+    /** Updates the calendar counter; the map owns its date-filtered counter inside the iframe. */
     _updateStats() {
         if (!this._stats.initialized || !this._selectedCalData)
             return;
@@ -248,6 +270,39 @@ class Calendars {
     static _makeUrl(calendarsData) {
         return Array.from(calendarsData, cal => `&src=${encodeURIComponent(cal.id)}&color=${encodeURIComponent(cal.clr)}`).join('')
     }
+};
+
+/** Removes the Google Visualization callback wrapper before JSON parsing. */
+function stripGoogleResponse(rawResponse) {
+    return rawResponse.replace(/^[^\(]*?setResponse\(|\);?\s*$/g, '');
+}
+
+const mapUrl = new URL('event-map.html', document.currentScript.src).href;
+
+let mapData;
+/** Caches both sheets across iframe navigations, but permits retry after a failed request. */
+calendars.loadMapData = () => {
+    if (!mapData) {
+        const sheets = [
+            ['1wXqLusMxEXWKGjQV1Q37wzJHGz9MSNXo-8J99XXEiy4', 'events'],
+            ['1nF_Orl4YXxKqkmJUkHPzv8O6vieNwTRJJLYzM1iM0Pc', 'geocoding']
+        ];
+        mapData = Promise.all(sheets.map(([id, sheet]) => $.ajax({
+            url: `https://docs.google.com/spreadsheets/d/${id}/gviz/tq`,
+            data: { tqx: 'out:json', sheet },
+            dataType: 'json',
+            dataFilter: stripGoogleResponse,
+            timeout: 30000
+        }).then(response => {
+            if (response?.status != 'ok' || !Array.isArray(response.table?.rows))
+                throw new Error(`Invalid ${sheet} sheet`);
+            return response.table;
+        }))).catch(error => {
+            mapData = null;
+            throw error;
+        });
+    }
+    return mapData;
 };
 
 var _calendars = null;
