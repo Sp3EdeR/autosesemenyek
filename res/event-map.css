@@ -1,0 +1,485 @@
+:root {
+  color-scheme: light dark;
+  font-family: "Google Sans", "Noto Sans", sans-serif;
+  --surface: #f0f4f9;
+  --text: #1f1f1f;
+  --border: #747775;
+  --calendar-filter: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  color: var(--text);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+/** Map toolbar and date filter styles */
+.map-toolbar {
+  flex: none;
+  height: 56px;
+  padding: 10px 130px 10px 12px;
+  position: relative;
+}
+
+#date-filter {
+  max-width: 100%;
+  position: relative;
+  z-index: 1100;
+}
+#date-filter summary {
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  cursor: pointer;
+  display: flex;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  gap: 8px;
+  height: 36px;
+  list-style: none;
+  padding: 0 12px;
+  width: fit-content;
+  max-width: 100%;
+}
+#date-filter summary::-webkit-details-marker {
+  display: none;
+}
+#date-range {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#date-form {
+  background: var(--surface);
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px #0006;
+  display: grid;
+  font-size: 14px;
+  gap: 8px;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 12px;
+  position: absolute;
+  top: 42px;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+}
+#date-form label {
+  align-self: center;
+}
+#date-form input {
+  min-width: 0;
+  padding: 6px;
+}
+#date-form button {
+  grid-column: 1 / -1;
+  padding: 6px;
+}
+#date-form input[type="text"],
+#date-form button[type="reset"] {
+  background: color-mix(in srgb, var(--text) 8%, var(--surface));
+  border: none;
+  border-radius: 6px;
+  box-shadow: none;
+  color: var(--text);
+}
+#date-form button[type="reset"] {
+  cursor: pointer;
+}
+#date-form button[type="reset"]:hover {
+  background: color-mix(in srgb, var(--text) 14%, var(--surface));
+}
+
+.flatpickr-wrapper,
+.flatpickr-wrapper input {
+  width: 100%;
+}
+.flatpickr-calendar {
+  background: var(--surface);
+  border: none;
+  box-shadow: 0 4px 12px #0006;
+  color: var(--text);
+  max-width: calc(100vw - 24px);
+}
+.flatpickr-calendar.static {
+  left: auto;
+  right: 0;
+  top: calc(100% + 4px);
+}
+.flatpickr-days,
+.dayContainer {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+.flatpickr-day,
+.flatpickr-months .flatpickr-month,
+span.flatpickr-weekday,
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+  color: var(--text);
+  fill: var(--text);
+}
+.flatpickr-calendar.arrowTop:after {
+  border-bottom-color: var(--surface);
+}
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay,
+.flatpickr-day.flatpickr-disabled {
+  color: var(--border);
+  opacity: .5;
+}
+.flatpickr-day.selected {
+  color: #fff;
+}
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+  background: var(--surface);
+}
+.flatpickr-day:hover {
+  background: #80808026;
+}
+
+.date-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 4px 8px;
+}
+#date-form .date-actions button {
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: inherit;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+#date-form .date-actions button:hover {
+  background: #80808014;
+}
+
+/* Main content under header */
+.map-warning {
+  background: #b3261e;
+  border-radius: 12px 12px 0 0;
+  color: #fff;
+  flex: none;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 3px 12px;
+  text-align: center;
+}
+#map {
+  border-radius: 0 0 12px 12px;
+  container-type: inline-size;
+  flex: 1;
+  min-height: 180px;
+  overflow: hidden;
+  position: relative;
+}
+.map-footer {
+  background: var(--surface);
+  color: var(--text);
+  flex: none;
+  font: 12px/1.5 "Google Sans", Roboto, Arial, sans-serif;
+  font-stretch: normal;
+  min-height: 28px;
+  padding: 4px 190px;
+  position: relative;
+  text-align: center;
+}
+/* Subscription links */
+#map-subscribe {
+  left: 12px;
+  position: absolute;
+  text-decoration: none;
+  top: 50%;
+  transform: translateY(-50%);
+}
+#map-subscribe:hover {
+  text-decoration: underline;
+}
+#map-subscribe i {
+  display: none;
+}
+
+/* Map styles */
+
+/* Event markers */
+.event-marker {
+  position: relative;
+}
+.event-marker i {
+  background: var(--event-color, #b3261e);
+  background-clip: text;
+  color: transparent;
+  display: block;
+  filter: var(--calendar-filter) drop-shadow(0 1px 2px #0008);
+  font-size: 40px;
+  text-align: center;
+  width: 32px;
+}
+.event-count {
+  background: #fff;
+  border-radius: 7px;
+  color: #1f1f1f;
+  font: bold 10px/14px "Google Sans", sans-serif;
+  left: 50%;
+  min-width: 14px;
+  padding: 0 2px;
+  position: absolute;
+  text-align: center;
+  top: 14px;
+  transform: translate(-50%, -50%);
+}
+/* Leaflet controls */
+.leaflet-bar a {
+  color: #000;
+}
+/* Keep controls clear of wrapped attribution. */
+.leaflet-bottom:not(:has(.leaflet-control-attribution)) {
+  bottom: var(--attribution-height, 0px);
+}
+.leaflet-bottom.leaflet-right .leaflet-control-scale {
+  bottom: 22px;
+  position: absolute;
+  right: 44px;
+}
+/* Event labels on the map*/
+.event-label {
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: #000;
+  font: 11px/1.4 "Google Sans", Roboto, Arial, sans-serif;
+  max-width: 160px;
+  overflow: hidden;
+  padding: 1px 3px;
+  pointer-events: none;
+  text-overflow: ellipsis;
+  text-shadow: 0 0 2px #fff, 0 1px 2px #fff;
+  white-space: nowrap;
+}
+.event-label::before {
+  display: none;
+}
+.theme-dark .event-label {
+  color: #fff;
+  text-shadow: 0 0 2px #000, 0 1px 2px #000;
+}
+/* Event details popup */
+.event-popup {
+  width: min(95cqw, 550px);
+}
+.event-popup .leaflet-popup-content {
+  width: auto !important;
+}
+.event-calendar-color {
+  background: var(--event-color, #b3261e);
+  border-radius: 3px;
+  filter: var(--calendar-filter);
+  height: 12px;
+  margin-top: 4px;
+  width: 12px;
+}
+.event-details {
+  font-family: "Google Sans", "Noto Sans", "Arial", sans-serif;
+  font-weight: 400;
+  max-height: 50vh;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+.event-details h2 {
+  font-size: 22px;
+  margin: 0;
+}
+.event-details p {
+  margin: 0;
+}
+.event-details section {
+  align-items: start;
+  display: grid;
+  gap: 6px 8px;
+  grid-template-columns: 16px minmax(0, 1fr);
+  padding: 8px 0;
+}
+.event-details section + section {
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
+}
+.event-time {
+  grid-column: 2;
+}
+.event-location {
+  border-radius: 4px;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  text-decoration: none;
+}
+.event-location:hover,
+.event-location:focus-visible {
+  background: #80808031;
+}
+.event-description {
+  white-space: pre-line;
+}
+.event-details a,
+#map-subscribe {
+  color: #007bff;
+}
+/* Custom scrollbar for event details */
+.event-details::-webkit-scrollbar {
+  width: 8px;
+}
+.event-details::-webkit-scrollbar-track {
+  background: transparent;
+}
+.event-details::-webkit-scrollbar-thumb {
+  background: #0003;
+  background-clip: content-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+}
+.event-details::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* Dark mode styles*/
+.theme-dark {
+  --surface: #080c11;
+  --text: #fff;
+  --border: #9c9c9c;
+  --calendar-filter: invert(1) hue-rotate(180deg);
+}
+/* Dark mode links */
+.theme-dark .event-details a,
+.theme-dark #map-subscribe {
+  color: #8ab4f8;
+}
+/* Date filter */
+.theme-dark #date-filter summary {
+  border-color: #878a88;
+  color: #c0c0c0;
+}
+.theme-dark #date-form,
+.theme-dark .flatpickr-calendar {
+  box-shadow: 0 4px 12px #fff6;
+}
+/* Dark mode custom scrollbar for event details */
+.theme-dark .event-details::-webkit-scrollbar-thumb {
+  background: #fff3;
+}
+@supports not selector(::-webkit-scrollbar) {
+  .event-details {
+    scrollbar-color: #0003 transparent;
+    scrollbar-width: thin;
+  }
+  .theme-dark .event-details {
+    scrollbar-color: #fff3 transparent;
+  }
+}
+/* Leaflet controls dark mode*/
+.theme-dark .leaflet-bar a,
+.theme-dark .leaflet-control-layers {
+  background-color: #13192e;
+  color: #fff;
+}
+.theme-dark .leaflet-bar a:hover {
+  background-color: #1e2644;
+}
+.theme-dark .leaflet-control-layers,
+.theme-dark .leaflet-bar {
+  border: 2px solid #9c9c9c33;
+}
+.theme-dark .leaflet-popup-content-wrapper,
+.theme-dark .leaflet-popup-tip {
+  background-color: var(--surface);
+  color: #fff;
+  box-shadow: 0 3px 14px #000b;
+}
+.theme-dark .leaflet-control-attribution {
+  background-color: #13192eaf;
+  color: #fff;
+}
+.theme-dark .leaflet-control-scale-line {
+  background-color: #13192e80;
+  border: 2px solid #9c9c9c;
+  border-top: none;
+  color: #ccc;
+}
+.theme-dark .leaflet-control-locate:not([class~=active]) .leaflet-control-locate-location-arrow,
+.theme-dark .leaflet-control-locate-spinner {
+  filter: invert(1);
+}
+
+/* Map dark mode filters. */
+.theme-dark .tile-openstreetmap,
+.theme-dark .tile-googlemap,
+.theme-dark .tile-googleterrain {
+  filter: brightness(.6) invert(1) contrast(3) hue-rotate(200deg) saturate(.3) brightness(.7);
+}
+.theme-dark .tile-opentopomap {
+  filter: brightness(.65) invert(.8) contrast(2.5) hue-rotate(200deg) saturate(.6) brightness(.8);
+}
+/* Map overlay dark mode filters*/
+.theme-dark .tile-satellite,
+.theme-dark .tile-googlesatellite,
+.theme-dark .overlay-turistautak {
+  filter: brightness(.8);
+}
+.theme-dark .overlay-dem {
+  filter: invert(1);
+}
+.overlay-satelliteroads {
+  filter: opacity(.6);
+}
+
+/* Narrow (mobile) view */
+@media (max-width: 625px) {
+  /** Map toolbar and date filter styles */
+  .map-toolbar {
+    padding-right: 52px;
+  }
+  #date-filter summary {
+    font-size: 12px;
+  }
+  /* Main content under header */
+  .map-footer {
+    padding-inline: 40px;
+  }
+  /* Subscription links */
+  #map-subscribe {
+    font-size: 16px;
+    left: auto;
+    line-height: 28px;
+    right: 8px;
+    width: 28px;
+  }
+  #map-subscribe,
+  #map-subscribe:hover,
+  .theme-dark #map-subscribe {
+    color: var(--border);
+    text-decoration: none;
+  }
+  #map-subscribe span {
+    display: none;
+  }
+  #map-subscribe i {
+    display: inline;
+  }
+}

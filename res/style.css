@@ -152,6 +152,20 @@ main p, main p.form-check {
   margin-bottom: 0.5rem;
 }
 
+/* Map view styling*/
+.calendar-map-view .feedback-cover,
+.calendar-map-view .controls-calendar-count {
+  display: none;
+}
+.calendar-map-view .controls-calendar-view {
+  top: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  .calendar-map-view iframe {
+    filter: invert(1) hue-rotate(-180deg);
+  }
+}
+
 /* Full cover for the iframe feedback button */
 .feedback-cover {
   position: absolute;
