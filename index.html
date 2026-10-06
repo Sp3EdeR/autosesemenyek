@@ -115,6 +115,10 @@
 
       <main class="inner cover">
         <div class="calendar-container position-relative">
+          <div class="calendar-loading-overlay position-absolute top-0 start-0 w-100 h-100 d-none flex-column align-items-center justify-content-center text-black z-1" role="status">
+            <div class="spinner-border" style="width: 64px; height: 64px;" aria-hidden="true"></div>
+            <div class="mt-2">Naptár betöltése...</div>
+          </div>
           <script>
             calendars.init({
               'Autó': {

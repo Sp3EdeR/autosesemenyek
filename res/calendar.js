@@ -202,8 +202,15 @@ class Calendars {
 </div>
 `));
 
+        this._loadingOverlay = this._container.find('.calendar-loading-overlay')
+            .appendTo(this._container.find('.calendar-frame-container'));
         this._calendarFrame = this._container.find('iframe').first();
-        this._calendarFrame.on('load', () => this._updateMapFilters());
+        this._calendarFrame.on('load', event => {
+            if (event.currentTarget !== this._calendarFrame[0])
+                return;
+            this._loadingOverlay.removeClass('d-flex').addClass('d-none');
+            this._updateMapFilters();
+        });
         this._urlBase =
             'https://calendar.google.com/calendar/u/0/embed?height=600&wkst=2&bgcolor=%23eef1f8' +
             '&ctz=Europe%2FBudapest&showTz=0&showPrint=0&showDate=1&showTabs=0&showCalendars=0' +
@@ -233,7 +240,7 @@ class Calendars {
         this._calendarFrame.attr('title', isMap ? 'Eseménytérkép' : 'Naptár');
         if (isMap) {
             if (this._calendarFrame.attr('src') != mapUrl)
-                this._calendarFrame.attr('src', mapUrl);
+                this._replaceCalendarFrame(mapUrl);
             else
                 this._updateMapFilters();
             return;
@@ -242,9 +249,18 @@ class Calendars {
         let options = '&mode=' + this._tabs.currentMode;
         options = this._selectedCalData.reduce(
             (accumul, data) => accumul + Calendars._makeUrl(data.cals), options);
-        this._calendarFrame.attr('src', this._urlBase + options);
+        this._replaceCalendarFrame(this._urlBase + options);
 
         this._updateStats();
+    }
+    /** Replaces the iframe with a new instance to avoid a back history entry on navigation. */
+    _replaceCalendarFrame(src) {
+        if (this._calendarFrame.attr('src') == src)
+            return;
+        this._loadingOverlay.removeClass('d-none').addClass('d-flex');
+        const previousFrame = this._calendarFrame;
+        this._calendarFrame = previousFrame.clone(true).attr('src', src);
+        previousFrame.replaceWith(this._calendarFrame);
     }
     /** Passes calendar IDs and marker colors to the same-origin map iframe after it loads. */
     _updateMapFilters() {
