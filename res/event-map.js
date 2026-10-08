@@ -384,9 +384,9 @@ class EventMap {
                 // Overlay DOM Pins at low zoom levels for better interactivity
                 const icon = L.divIcon({
                     className: 'event-marker',
-                    iconSize: [32, 40],
-                    iconAnchor: [16, 40],
-                    popupAnchor: [0, -36],
+                    iconSize: [24, 30],
+                    iconAnchor: [12, 30],
+                    popupAnchor: [0, -26],
                     html: `<i class="fa-solid fa-location-dot" aria-hidden="true"></i> ${
                         events.length > 1 ? `<span class="event-count">${events.length}</span>` : ''
                     }`
@@ -432,7 +432,7 @@ class EventMap {
                 marker.bindTooltip(label, {
                     permanent: true,
                     direction: 'bottom',
-                    offset: [0, 4],
+                    offset: [0, -5],
                     className: 'event-label',
                     interactive: false
                 });
