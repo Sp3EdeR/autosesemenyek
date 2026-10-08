@@ -220,6 +220,9 @@ span.flatpickr-weekday,
 /* Map styles */
 
 /* Event markers */
+.event-dot-pane {
+  filter: var(--calendar-filter);
+}
 .event-marker {
   position: relative;
 }
