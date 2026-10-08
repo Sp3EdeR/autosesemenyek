@@ -43,6 +43,35 @@ function geocodedEvents(eventsTable, locationsTable) {
     });
 }
 
+/** Extends Leaflet's Canvas renderer to draw custom 12px event pins. */
+const CanvasPinRenderer = L.Canvas.extend({
+    _updateCircle(pin) {
+        if (!this._drawing || pin._empty())
+            return;
+        const context = this._ctx;
+        const { x, y } = pin._point;
+        context.beginPath();
+        context.moveTo(x, y + 6);
+        context.bezierCurveTo(x - 2, y + 3, x - 4, y, x - 4, y - 2);
+        context.arc(x, y - 2, 4, Math.PI, 0);
+        context.bezierCurveTo(x + 4, y, x + 2, y + 3, x, y + 6);
+        context.closePath();
+        this._fillStroke(context, pin);
+    }
+});
+
+/** Extends Leaflet's CircleMarker to create custom event pins with adjusted projection and popup anchor. */
+const CanvasPin = L.CircleMarker.extend({
+    _project() {
+        L.CircleMarker.prototype._project.call(this);
+        this._point.y -= 6;
+        this._updateBounds();
+    },
+    _getPopupAnchor() {
+        return [0, -12];
+    }
+});
+
 /** Displays geocoded events inside the calendar iframe using huroutes' Leaflet setup. */
 class EventMap {
     /** Creates map controls immediately; only this iframe requests event and geocoding data. */
@@ -51,8 +80,16 @@ class EventMap {
         this._events = [];
         this._map = L.map('map', { zoomControl: false })
             .fitBounds([[48.509, 15.659], [45.742, 23.193]]);
+        this._map.createPane('eventDotPane').classList.add('event-dot-pane');
+        this._dotRenderer = new CanvasPinRenderer({ pane: 'eventDotPane', tolerance: 10 });
         this._markers = L.layerGroup().addTo(this._map);
-        this._map.on('zoomend moveend', () => this._updateLabels());
+        this._map.on('zoomend', () => {
+            if (this._usingDots != (this._map.getZoom() < 10))
+                this._render();
+            else
+                this._updateLabels();
+        });
+        this._map.on('moveend', () => this._updateLabels());
         this._map.on('resize', () => this._markers.eachLayer(m => m.getPopup().update()));
         this._status = document.getElementById('map-status');
         this._initLayers();
@@ -65,6 +102,10 @@ class EventMap {
         const updateTheme = () => {
             document.documentElement.classList.toggle('theme-dark', theme.matches);
             document.documentElement.classList.toggle('theme-light', !theme.matches);
+            // Black border always, but map colour inversion must be corrected
+            this._dotBorderColor = theme.matches ? '#fff' : '#000';
+            if (this._usingDots)
+                this._markers.eachLayer(dot => dot.setStyle({ color: this._dotBorderColor }));
         };
         theme.addEventListener('change', updateTheme);
         updateTheme();
@@ -315,34 +356,65 @@ class EventMap {
         }
 
         // Refresh map markers
+        const usingDots = this._map.getZoom() < 10;
+        const openMarker = this._usingDots != usingDots ?
+            this._markers.getLayers().find(marker => marker.isPopupOpen()) : null;
+        const openLocation = openMarker?.getLatLng();
+        const scrollTop = openMarker?.getPopup().getElement()
+            ?.querySelector('.event-details')?.scrollTop ?? 0;
+        let replacement;
+        this._usingDots = usingDots;
         this._markers.clearLayers();
         for (const events of groups.values()) {
-            // Create the marker icon with text label
-            const icon = L.divIcon({
-                className: 'event-marker',
-                iconSize: [32, 40],
-                iconAnchor: [16, 40],
-                popupAnchor: [0, -36],
-                html: `<i class="fa-solid fa-location-dot" aria-hidden="true"></i> ${
-                    events.length > 1 ? `<span class="event-count">${events.length}</span>` : ''
-                }`
-            });
-            const marker = L.marker(events[0].coordinates, { icon, title: events[0].location });
+            const calendars = [...new Set(events.map(event => event.calendarId))];
+            const colors = calendars.map(id => this._calendars.get(id));
+            let marker;
+            if (this._usingDots) {
+                // Draw pins onto the canvas at high zoom levels for performance
+                const color = colors.length > 1 ? '#' + [1, 3, 5].map(offset =>
+                    Math.round(colors.reduce((sum, color) =>
+                        sum + parseInt(color.slice(offset, offset + 2), 16), 0) / colors.length)
+                        .toString(16).padStart(2, '0')).join('') : colors[0];
+                marker = new CanvasPin(events[0].coordinates, {
+                    renderer: this._dotRenderer, radius: 6,
+                    color: this._dotBorderColor, weight: 0.5, opacity: 1,
+                    stroke: true, fillColor: color, fillOpacity: 1
+                });
+            } else {
+                // Overlay DOM Pins at low zoom levels for better interactivity
+                const icon = L.divIcon({
+                    className: 'event-marker',
+                    iconSize: [32, 40],
+                    iconAnchor: [16, 40],
+                    popupAnchor: [0, -36],
+                    html: `<i class="fa-solid fa-location-dot" aria-hidden="true"></i> ${
+                        events.length > 1 ? `<span class="event-count">${events.length}</span>` : ''
+                    }`
+                });
+                marker = L.marker(events[0].coordinates, { icon, title: events[0].location });
+                const stops = colors.map((color, index) =>
+                    color + (index == 0 ? ' 25%' : index == colors.length - 1 ? ' 90%' : ''));
+                const color = colors.length > 1
+                    ? `linear-gradient(135deg, ${stops.join(', ')})`
+                    : colors[0];
+                marker.on('add', () => marker.getElement().style.setProperty('--event-color', color));
+            }
             marker.eventSummary = events.length == 1 ? events[0].summary : null;
             marker.bindPopup(() => this._popup(events), {
                 className: 'event-popup', maxWidth: 550, minWidth: 220
             });
-            // Apply marker color by calendar color data; incl mixed gradients
-            const calendars = [...new Set(events.map(event => event.calendarId))];
-            const colors = calendars.map(id => this._calendars.get(id));
-            const stops = colors.map((color, index) =>
-                color + (index == 0 ? ' 25%' : index == colors.length - 1 ? ' 90%' : ''));
-            const color = colors.length > 1
-                ? `linear-gradient(135deg, ${stops.join(', ')})`
-                : colors[0];
-            marker.on('add', () => marker.getElement().style.setProperty('--event-color', color));
 
             this._markers.addLayer(marker);
+            if (openLocation && marker.getLatLng().equals(openLocation))
+                replacement = marker;
+        }
+        if (replacement) {
+            const popup = replacement.getPopup();
+            const autoPan = popup.options.autoPan;
+            popup.options.autoPan = false;
+            replacement.openPopup();
+            popup.getElement().querySelector('.event-details').scrollTop = scrollTop;
+            popup.options.autoPan = autoPan;
         }
         this._updateLabels();
         this._status.textContent = `${count} esemény · ${groups.size} helyszín`;
