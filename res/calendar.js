@@ -348,7 +348,7 @@ calendars.startTour = () => {
     const tour = introJs.tour().setOptions({
         steps: [
             { element: '.date-tour-helper', title: 'Dátumválasztó', intro: 'Itt válthatsz másik dátum megjelenítésére.' },
-            { element: '.controls-calendar-view > button', title: 'Naptár Nézete', intro: 'Itt változtathatod meg a naptár nézetét.' },
+            { element: '.controls-calendar-view > button', title: 'Naptár Nézete', intro: 'Itt változtathatod meg a naptár nézetét.<p style="text-align:left"><b>Ütemezés</b>: Események listája<br/><b>Hónap</b>: Egész hónap eseményei<br/><b>Térkép</b>: Események helyszínei a térképen</p>' },
             { element: '.calendar-frame-container', title: 'Esemény Részletei', intro: 'Kattints egy eseményre, hogy további információkat olvashass róla.' },
             { element: '#calendar-switch-container', title: 'Esemény Típus Szűrők', intro: 'Itt jeleníthetsz meg vagy rejthetsz el esemény típusokat.' },
             { title: 'Google Naptárba Vétel', intro: 'Nem muszáj mindig ide látogatnod, <a href="#" onclick="calendars.openSubscription(); event.preventDefault();">kattints ide</a>, hogy a Google Naptáradból is követhesd az eseményeket.' },
