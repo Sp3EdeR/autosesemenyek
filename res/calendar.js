@@ -105,9 +105,11 @@ class CalendarStats {
 class CalendarSwitches {
     constructor(container) {
         this._switchContainer = container.find('.controls-calendar-switches');
-        const toggle = container.find('[data-bs-toggle="collapse"][href="#calendar-switches"]');
-        this._caretUp = toggle.find('.fa-caret-up');
-        this._caretDown = toggle.find('.fa-caret-down');
+        this._toggle = container.find('[data-bs-toggle="collapse"][href="#calendar-switches"]');
+        this._caretUp = this._toggle.find('.fa-caret-up');
+        this._caretDown = this._toggle.find('.fa-caret-down');
+        this._mobileExpanded = pageStorage.getItem('filtersExpanded') !== 'false';
+        this._wideView = window.matchMedia('(min-width: 576px)');
         this._updateCallback = null;
         this._switchContainer.on('change', event => {
             const switchCtrl = $(event.target);
@@ -117,9 +119,11 @@ class CalendarSwitches {
         });
 
         this._switchContainer.on('show.bs.collapse', () => {
+            this._saveMobileExpanded(true);
             this._syncCaretState(true);
         });
         this._switchContainer.on('hide.bs.collapse', () => {
+            this._saveMobileExpanded(false);
             this._syncCaretState(false);
         });
     }
@@ -145,7 +149,7 @@ class CalendarSwitches {
             this._switchContainer.removeClass('d-none');
 
         this._updateCollapse();
-        $(window).on('resize', () => this._updateCollapse());
+        this._wideView.addEventListener('change', () => this._updateCollapse());
 
         this._updateCallback?.();
     }
@@ -156,13 +160,24 @@ class CalendarSwitches {
 
     onUpdate(onUpdate) { this._updateCallback = onUpdate; }
 
+    _saveMobileExpanded(isExpanded) {
+        if (this._expanded)
+            return;
+        this._mobileExpanded = isExpanded;
+        pageStorage.setItem('filtersExpanded', isExpanded);
+    }
+
     _updateCollapse() {
-        const expand = 576 <= $(window).width();
+        const expand = this._wideView.matches;
         if (this._expanded === expand)
             return;
 
-        this._switchContainer.toggleClass('show', expand);
-        this._syncCaretState(expand);
+        if (this._switchContainer.hasClass('collapsing'))
+            this._switchContainer[0].dispatchEvent(new Event('transitionend'));
+        const isExpanded = expand || this._mobileExpanded;
+        this._switchContainer.toggleClass('show', isExpanded);
+        this._toggle.toggleClass('collapsed', !isExpanded).attr('aria-expanded', isExpanded);
+        this._syncCaretState(isExpanded);
         this._expanded = expand;
     }
 
