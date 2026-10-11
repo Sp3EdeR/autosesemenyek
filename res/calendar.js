@@ -315,12 +315,20 @@ let mapData;
 calendars.loadMapData = () => {
     if (!mapData) {
         const sheets = [
-            ['1wXqLusMxEXWKGjQV1Q37wzJHGz9MSNXo-8J99XXEiy4', 'events'],
-            ['1nF_Orl4YXxKqkmJUkHPzv8O6vieNwTRJJLYzM1iM0Pc', 'geocoding']
+            [
+                "1wXqLusMxEXWKGjQV1Q37wzJHGz9MSNXo-8J99XXEiy4",
+                "events",
+                "select * where D is not null and D != ''"
+            ],
+            [
+                "1nF_Orl4YXxKqkmJUkHPzv8O6vieNwTRJJLYzM1iM0Pc",
+                "geocoding",
+                "select A, B, C"
+            ]
         ];
-        mapData = Promise.all(sheets.map(([id, sheet]) => $.ajax({
+        mapData = Promise.all(sheets.map(([id, sheet, tq]) => $.ajax({
             url: `https://docs.google.com/spreadsheets/d/${id}/gviz/tq`,
-            data: { tqx: 'out:json', sheet },
+            data: { tqx: 'out:json', sheet, tq },
             dataType: 'json',
             dataFilter: stripGoogleResponse,
             timeout: 30000
