@@ -25,7 +25,11 @@ function geocodedEvents(eventsTable, locationsTable) {
     // Load events in database with location coordinates
     // Drop events with missing location or geocoding data
     const columns = ['start', 'end', 'summary', 'location', 'description', 'calendarId'];
+    const now = Date.now();
     return sheetRecords(eventsTable, columns).flatMap(event => {
+        const start = Date.parse(event.start), end = Date.parse(event.end);
+        if (end <= now)
+            return [];
         const name = normalizeLocation(event.location);
         if (!name)
             return [];
@@ -34,7 +38,6 @@ function geocodedEvents(eventsTable, locationsTable) {
             return [];
         }
         const coordinates = locations.get(name);
-        const start = Date.parse(event.start), end = Date.parse(event.end);
         if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) {
             console.warn(`Invalid event interval for event: ${event.summary}!`);
             return [];
@@ -231,6 +234,7 @@ class EventMap {
             allowInput: true,
             disableMobile: true,
             static: true,
+            minDate: 'today',
             onReady: (dates, value, picker) => {
                 // Add "clear" and "today" buttons to the panel
                 picker.altInput.id = picker.input.id + '-display';
@@ -259,7 +263,7 @@ class EventMap {
             event.preventDefault();
             this._start._flatpickr.clear(false);
             endPicker.clear(false);
-            endPicker.set('minDate', null);
+            endPicker.set('minDate', 'today');
             endPicker.altInput.setCustomValidity('');
             filter.open = false;
             this._render();
@@ -273,7 +277,7 @@ class EventMap {
                 'A záródátum nem előzheti meg a kezdődátumot.' : '');
             if (!form.reportValidity())
                 return;
-            endPicker.set('minDate', this._start.value || null);
+            endPicker.set('minDate', this._start.value || 'today');
             this._render();
         });
 
@@ -334,8 +338,10 @@ class EventMap {
             return;
 
         // Calculate date filter time range
-        const start = this._start.value ? new Date(this._start.value + 'T00:00:00').getTime() :
-            Date.now();
+        const start = Math.max(
+            Date.now(),
+            this._start.value ? new Date(this._start.value + 'T00:00:00').getTime() : 0
+        );
         const endDate = this._end.value ? new Date(this._end.value + 'T00:00:00') : null;
         // Advance a calendar day to preserve inclusive ends through daylight saving changes.
         endDate?.setDate(endDate.getDate() + 1);
