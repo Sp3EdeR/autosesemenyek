@@ -77,6 +77,12 @@ const CanvasPin = L.CircleMarker.extend({
 
 /** Displays geocoded events inside the calendar iframe using huroutes' Leaflet setup. */
 class EventMap {
+    /** Distance slider value meaning no distance limit. */
+    static Inf = '401';
+
+    /** Metres the user must move before marker distances are recalculated. */
+    static MoveThreshold = 500;
+
     /** Creates map controls immediately; only this iframe requests event and geocoding data. */
     constructor() {
         this._calendars = new Map();
@@ -96,9 +102,9 @@ class EventMap {
         this._map.on('resize', () => this._markers.eachLayer(m => m.getPopup().update()));
         this._status = document.getElementById('map-status');
         this._initLayers();
-        this._initLocation();
-
         this._initDates();
+        this._initDistance();
+        this._initLocation();
 
         // Update the dark/light theme now and on changes
         const theme = matchMedia('(prefers-color-scheme: dark)');
@@ -196,7 +202,7 @@ class EventMap {
 
     /** Uses huroutes' high-accuracy location control and stops following after pan or zoom. */
     _initLocation() {
-        const control = L.control.locate({
+        this._locationControl = L.control.locate({
             cacheLocation: false,
             clickBehavior: { inView: 'stop', outOfView: 'setView', inViewNotFollowing: 'setView' },
             initialZoomLevel: 16, keepCurrentZoomLevel: true, position: 'bottomright',
@@ -204,19 +210,201 @@ class EventMap {
             setView: 'untilPanOrZoom', showPopup: false,
             strings: { title: 'Az aktuális pozícióm mutatása.' },
             onLocationError: () => {
-                this._status.textContent = 'A helyzeted nem határozható meg.';
                 localStorage.removeItem('eventMapLocation');
+                const message = 'A helyzeted nem határozható meg.';
+                this._setLocation(null, message);
+                this._status.textContent = message;
             }
         }).addTo(this._map);
         this._map.on('locateactivate', () => localStorage.eventMapLocation = 'true');
-        this._map.on('locatedeactivate', () => localStorage.removeItem('eventMapLocation'));
+        this._map.on('locatedeactivate', () => {
+            localStorage.removeItem('eventMapLocation');
+            this._setLocation(null, 'A helymeghatározás leállt.');
+        });
+        this._map.on('locationfound', event => {
+            this._setLocation(event.latlng);
+        });
         if (localStorage.eventMapLocation) {
-            control.options.setView = false;
-            control.start();
-            control.options.setView = 'untilPanOrZoom';
+            this._locationControl.options.setView = false;
+            this._locationControl.start();
+            this._locationControl.options.setView = 'untilPanOrZoom';
             try {
-                control.stopFollowing();
+                this._locationControl.stopFollowing();
             } catch { }
+        }
+    }
+
+    // Keeps distance transient and waits for a location before accepting finite ranges.
+    _initDistance() {
+        this._distance = document.getElementById('distance');
+        this._distanceLabel = document.getElementById('distance-value');
+        this._distanceStatus = document.getElementById('filter-status');
+        this._distanceLimit = Infinity;
+        this._distanceJobId = 0;
+        this._distance.value = EventMap.Inf;
+        this._updateDistanceLabel();
+
+        const requestLocation = () => {
+            if (!this._location)
+                this.requestLocation();
+        };
+        this._distance.addEventListener('pointerdown', requestLocation);
+        this._distance.addEventListener('keydown', event => {
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+                'Home', 'End', 'PageUp', 'PageDown'].includes(event.key))
+                requestLocation();
+        });
+        const updateDistance = immediate => {
+            if (!this._location) {
+                this._distance.value = EventMap.Inf;
+                requestLocation();
+                this._updateDistanceLabel();
+                return;
+            }
+            if (this._distance.value == EventMap.Inf) {
+                this._resetDistance();
+                return;
+            }
+            this._distanceLimit = Number(this._distance.value);
+            this._distanceStatus.hidden = true;
+            this._updateDistanceLabel();
+            this._updateDistances(true);
+            if (immediate && this._distances)
+                this._renderDistance(true);
+        };
+        this._distance.addEventListener('input', () => updateDistance(false));
+        this._distance.addEventListener('change', () => updateDistance(true));
+
+        window.addEventListener('pagehide', () => {
+            clearTimeout(this._distanceRenderTimer);
+            this._distanceRenderTimer = null;
+            this._map.stopLocate();
+            this._setLocation(null);
+        });
+        window.addEventListener('pageshow', event => {
+            if (!event.persisted)
+                return;
+            this._resetDistance();
+            const resume = localStorage.eventMapLocation;
+            this._locationControl.stop();
+            if (resume)
+                this.requestLocation();
+        });
+    }
+
+    /** Requests the existing location control without changing the map camera. */
+    requestLocation() {
+        if (this._locationRequested)
+            return;
+        this._locationRequested = true;
+        const setView = this._locationControl.options.setView;
+        this._locationControl.options.setView = false;
+        try {
+            this._locationControl.start();
+            this._locationControl.stopFollowing();
+        } finally {
+            this._locationControl.options.setView = setView;
+        }
+    }
+
+    /** Sets the current location and updates distance display. null means no location. */
+    _setLocation(location, error = '') {
+        this._locationRequested = false;
+        this._location = location;
+        if (!location)
+            this._resetDistance(error);
+        else {
+            this._distanceStatus.hidden = true;
+            this._updateDistances();
+        }
+    }
+
+    /** Updates the distance label based on the current distance value. */
+    _updateDistanceLabel() {
+        const label = (this._distance.value == EventMap.Inf ? '\u221e' : this._distance.value) +
+            ' km';
+        this._distanceLabel.textContent = label;
+        this._distance.setAttribute('aria-valuetext', label);
+        this._updateFilterSummary();
+    }
+
+    /** Resets the distance display and terminates any ongoing distance calculation. */
+    _resetDistance(message = '') {
+        this._distanceLimit = Infinity;
+        this._distance.value = EventMap.Inf;
+        if (!this._location || message) {
+            this._distances = null;
+            this._distanceOrigin = null;
+            this._distanceJob = null;
+            this._distanceWorker?.terminate();
+            this._distanceWorker = null;
+        }
+        this._distanceStatus.textContent = message;
+        this._distanceStatus.hidden = !message;
+        this._updateDistanceLabel();
+        this._renderDistance(true);
+    }
+
+    /** Coalesces live range changes so marker rebuilds do not run on every input event. */
+    _renderDistance(immediate = false) {
+        if (immediate) {
+            clearTimeout(this._distanceRenderTimer);
+            this._distanceRenderTimer = null;
+            this._render();
+        } else if (this._distanceRenderTimer == null) {
+            // When the user drags the distance slider, delay rendering to avoid excessive updates
+            this._distanceRenderTimer = setTimeout(() => {
+                this._distanceRenderTimer = null;
+                this._render();
+            }, 100);
+        }
+    }
+
+    /** Reuses distances until the user moves MoveThreshold; only one worker job runs at a time. */
+    _updateDistances(updateRange = false) {
+        if (!this._location || !this._loaded || this._distanceJob)
+            return;
+        if (this._distances &&
+            this._distanceOrigin.distanceTo(this._location) < EventMap.MoveThreshold
+        ) {
+            if (updateRange)
+                this._renderDistance();
+            return;
+        }
+        try {
+            if (!this._distanceWorker) {
+                this._distanceWorker = new Worker('event-map-distance.js');
+                this._distanceWorker.onmessage = ({ data }) => {
+                    if (data.id != this._distanceJob)
+                        return;
+                    // The last distance job has completed; update event distances
+                    this._distanceJob = null;
+                    this._distances = data.distances;
+                    this._distanceOrigin = L.latLng(...data.location);
+                    this._events.forEach((event, index) => event.distance = data.distances[index]);
+
+                    // Without distance filter, only update labels; otherwise, re-render distances
+                    if (this._distanceLimit == Infinity)
+                        this._updateLabels();
+                    else
+                        this._renderDistance(true);
+
+                    // If the user moved 1km, trigger another distance update
+                    if (this._distanceOrigin.distanceTo(this._location) >= EventMap.MoveThreshold)
+                        this._updateDistances();
+                };
+                this._distanceWorker.onerror = () =>
+                    this._resetDistance('A távolságszűrő nem indítható el.');
+            }
+            // Run the distance calculation job in the background worker
+            this._distanceJob = ++this._distanceJobId;
+            this._distanceWorker.postMessage({
+                id: this._distanceJob,
+                location: [this._location.lat, this._location.lng],
+                coordinates: this._events.map(event => event.coordinates)
+            });
+        } catch {
+            this._resetDistance('A távolságszűrő nem indítható el.');
         }
     }
 
@@ -266,12 +454,14 @@ class EventMap {
             endPicker.set('minDate', 'today');
             endPicker.altInput.setCustomValidity('');
             filter.open = false;
-            this._render();
+            this._resetDistance();
         });
 
         // Limit the end time picker to dates after the start date.
         const endPicker = this._end._flatpickr;
-        form.addEventListener('change', () => {
+        form.addEventListener('change', event => {
+            if (event.target == this._distance)
+                return;
             const reversed = this._end.value && this._start.value > this._end.value;
             endPicker.altInput.setCustomValidity(reversed ?
                 'A záródátum nem előzheti meg a kezdődátumot.' : '');
@@ -314,6 +504,7 @@ class EventMap {
             this._events = geocodedEvents(...tables).sort((a, b) => a.start - b.start);
             this._loaded = true;
             this._render();
+            this._updateDistances();
         } catch (error) {
             console.error('Failed to load event map.', error);
             this._status.textContent = 'Az események betöltése sikertelen.';
@@ -326,13 +517,19 @@ class EventMap {
         this._render();
     }
 
-    /** Groups collocated events to avoid hidden markers and applies interval-overlap filtering. */
-    _render() {
-        // Update the date filter button's text
+    /** Updates the filter summary displayed on the dropdown control. */
+    _updateFilterSummary() {
         const formatDate = value => new Date(value + 'T00:00:00').toLocaleDateString('hu-HU');
         document.getElementById('date-range').textContent =
             (this._start.value ? formatDate(this._start.value) : 'Mostantól') + ' \u2013 ' +
-            (this._end.value ? formatDate(this._end.value) : 'Nincs záródátum');
+            (this._end.value ? formatDate(this._end.value) : 'Bármeddig');
+        document.getElementById('distance-range').textContent =
+            '\u2022 ' + this._distanceLabel.textContent;
+    }
+
+    /** Render map markers. */
+    _render() {
+        this._updateFilterSummary();
 
         if (!this._loaded)
             return;
@@ -347,13 +544,17 @@ class EventMap {
         endDate?.setDate(endDate.getDate() + 1);
         const end = endDate?.getTime() ?? Infinity;
 
-        // Group events by their coordinates to handle collocated events
+        // Apply event marker filters
         const groups = new Map();
         let count = 0;
-        for (const event of this._events) {
-            if (!this._calendars.has(event.calendarId) || event.end <= start ||
-                event.start >= end)
+        for (const [index, event] of this._events.entries()) {
+            const tooFar = this._distanceLimit !== Infinity &&
+                (!this._distances || this._distances[index] > this._distanceLimit * 1000);
+            const outsideDates = event.end <= start || event.start >= end;
+            const hiddenCategory = !this._calendars.has(event.calendarId);
+            if (tooFar || outsideDates || hiddenCategory)
                 continue;
+
             const key = event.coordinates.join(',');
             if (!groups.has(key))
                 groups.set(key, []);
@@ -363,8 +564,7 @@ class EventMap {
 
         // Refresh map markers
         const usingDots = this._map.getZoom() < 10;
-        const openMarker = this._usingDots != usingDots ?
-            this._markers.getLayers().find(marker => marker.isPopupOpen()) : null;
+        const openMarker = this._markers.getLayers().find(marker => marker.isPopupOpen());
         const openLocation = openMarker?.getLatLng();
         const scrollTop = openMarker?.getPopup().getElement()
             ?.querySelector('.event-details')?.scrollTop ?? 0;
@@ -405,7 +605,8 @@ class EventMap {
                     : colors[0];
                 marker.on('add', () => marker.getElement().style.setProperty('--event-color', color));
             }
-            marker.eventSummary = events.length == 1 ? events[0].summary : null;
+            marker.summary = events.length == 1 ? events[0].summary : null;
+            marker.event = events[0];
             marker.bindPopup(() => this._popup(events), {
                 className: 'event-popup', maxWidth: 550, minWidth: 220
             });
@@ -426,15 +627,22 @@ class EventMap {
         this._status.textContent = `${count} esemény · ${groups.size} helyszín`;
     }
 
-    /** Allocates labels only for visible single-event pins at town zoom or closer. */
+    /** Allocates labels only for visible event pins at town zoom or closer. */
     _updateLabels() {
         const closeZoom = this._map.getZoom() >= 10;
         const bounds = this._map.getBounds();
         this._markers.eachLayer(marker => {
-            const show = closeZoom && marker.eventSummary && bounds.contains(marker.getLatLng());
-            if (show && !marker.getTooltip()) {
+            if (!closeZoom || !bounds.contains(marker.getLatLng())) {
+                // Hide tooltips at high zoom levels and out of viewport.
+                if (marker.getTooltip())
+                    marker.unbindTooltip();
+                return;
+            }
+            const dist = this._distances ? Math.round(marker.event.distance / 1000) + ' km' : '';
+            const text = [dist, marker.summary].filter(Boolean).join(' · ');
+            if (!marker.getTooltip()) {
                 const label = document.createElement('span');
-                label.textContent = marker.eventSummary;
+                label.textContent = text;
                 marker.bindTooltip(label, {
                     permanent: true,
                     direction: 'bottom',
@@ -442,8 +650,9 @@ class EventMap {
                     className: 'event-label',
                     interactive: false
                 });
-            } else if (!show && marker.getTooltip()) {
-                marker.unbindTooltip();
+            } else if (marker.getTooltip().getContent().textContent != text) {
+                marker.getTooltip().getContent().textContent = text;
+                marker.getTooltip().update();
             }
         });
     }
