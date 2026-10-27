@@ -73,7 +73,7 @@ class CalendarStats {
     onStatsLoaded(onStatsLoaded) { this._onStatsLoaded = onStatsLoaded; }
     _updateStats() {
         $.ajax({
-            url: 'https://docs.google.com/spreadsheets/d/1i_0o2470jbDeX4mbXD4U29wNz-aVjPA2irWM8t-_5T4/gviz/tq?tqx=out:json',
+            url: 'https://docs.google.com/spreadsheets/d/1i_0o2470jbDeX4mbXD4U29wNz-aVjPA2irWM8t-_5T4/gviz/tq?tqx=out:json&headers=1',
             dataType: 'json',
             dataFilter: stripGoogleResponse,
             success: stats => {
@@ -328,7 +328,7 @@ calendars.loadMapData = () => {
         ];
         mapData = Promise.all(sheets.map(([id, sheet, tq]) => $.ajax({
             url: `https://docs.google.com/spreadsheets/d/${id}/gviz/tq`,
-            data: { tqx: 'out:json', sheet, tq },
+            data: { tqx: 'out:json', headers: 1, sheet, tq },
             dataType: 'json',
             dataFilter: stripGoogleResponse,
             timeout: 30000
