@@ -34,15 +34,25 @@
 <body>
   <div class="map-toolbar">
     <details id="date-filter">
-      <summary title="Dátumtartomány kiválasztása">
+      <summary title="Dátum- és távolságszűrő">
         <i class="fa-regular fa-calendar" aria-hidden="true"></i>
         <span id="date-range">Mostantól</span>
+        <span id="distance-range">· ∞ km</span>
         <i class="fa-solid fa-caret-down" aria-hidden="true"></i>
       </summary>
       <form id="date-form">
-        <label for="date-start-display">Kezdet</label> <input id="date-start" type="date">
-        <label for="date-end-display">Vége</label> <input id="date-end" type="date">
+        <fieldset>
+          <legend>Dátumok Között</legend>
+          <label for="date-start-display">Kezdet</label> <input id="date-start" type="date">
+          <label for="date-end-display">Vége</label> <input id="date-end" type="date">
+        </fieldset>
+        <fieldset>
+          <legend id="distance-title">Távolság</legend>
+          <input id="distance" type="range" min="5" max="401" step="1" value="401" aria-labelledby="distance-title" aria-describedby="filter-status">
+          <output id="distance-value" for="distance">∞ km</output>
+        </fieldset>
         <button type="reset"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> Minden Esemény</button>
+        <div id="filter-status" role="status" aria-live="polite" hidden></div>
       </form>
     </details>
   </div>

@@ -28,7 +28,7 @@ input {
   font: inherit;
 }
 
-/** Map toolbar and date filter styles */
+/** Map toolbar and filter styles */
 .map-toolbar {
   flex: none;
   height: 56px;
@@ -64,6 +64,11 @@ input {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+#distance-range,
+#date-filter summary > i {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 #date-form {
   background: var(--surface);
   border: none;
@@ -72,12 +77,44 @@ input {
   display: grid;
   font-size: 14px;
   gap: 8px;
-  grid-template-columns: auto minmax(0, 1fr);
   padding: 12px;
   position: absolute;
   top: 42px;
   width: 320px;
   max-width: calc(100vw - 24px);
+}
+#date-form fieldset {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin: 0;
+  min-width: 0;
+  padding: 8px;
+}
+#date-form legend {
+  padding: 0 4px;
+}
+#date-form fieldset:has(#distance) {
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr) 64px;
+}
+#date-form #distance {
+  cursor: pointer;
+  padding: 0;
+  width: 100%;
+}
+#distance-value {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+#filter-status {
+  background: #b3261e;
+  border-radius: 0 0 6px 6px;
+  color: #fff;
+  margin: 0 -12px -12px;
+  padding: 6px 12px;
 }
 #date-form label {
   align-self: center;
