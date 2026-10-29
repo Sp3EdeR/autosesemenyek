@@ -527,51 +527,27 @@ class EventMap {
             '\u2022 ' + this._distanceLabel.textContent;
     }
 
-    /** Render map markers. */
+    /** Render map markers.
+     * This function runs on init, when filters change or when zooming past "dot" view.
+    */
     _render() {
         this._updateFilterSummary();
 
         if (!this._loaded)
             return;
 
-        // Calculate date filter time range
-        const start = Math.max(
-            Date.now(),
-            this._start.value ? new Date(this._start.value + 'T00:00:00').getTime() : 0
-        );
-        const endDate = this._end.value ? new Date(this._end.value + 'T00:00:00') : null;
-        // Advance a calendar day to preserve inclusive ends through daylight saving changes.
-        endDate?.setDate(endDate.getDate() + 1);
-        const end = endDate?.getTime() ?? Infinity;
-
-        // Apply event marker filters
-        const groups = new Map();
-        let count = 0;
-        for (const [index, event] of this._events.entries()) {
-            const tooFar = this._distanceLimit !== Infinity &&
-                (!this._distances || this._distances[index] > this._distanceLimit * 1000);
-            const outsideDates = event.end <= start || event.start >= end;
-            const hiddenCategory = !this._calendars.has(event.calendarId);
-            if (tooFar || outsideDates || hiddenCategory)
-                continue;
-
-            const key = event.coordinates.join(',');
-            if (!groups.has(key))
-                groups.set(key, []);
-            groups.get(key).push(event);
-            ++count;
-        }
+        const { groups, count } = this._groupEvents();
 
         // Refresh map markers
         const usingDots = this._map.getZoom() < 10;
         const openMarker = this._markers.getLayers().find(marker => marker.isPopupOpen());
-        const openLocation = openMarker?.getLatLng();
+        const openPopupEvents = new Set(openMarker?.events);
         const scrollTop = openMarker?.getPopup().getElement()
             ?.querySelector('.event-details')?.scrollTop ?? 0;
         let replacement;
         this._usingDots = usingDots;
         this._markers.clearLayers();
-        for (const events of groups.values()) {
+        for (const { events } of groups) {
             const calendars = [...new Set(events.map(event => event.calendarId))];
             const colors = calendars.map(id => this._calendars.get(id));
             let marker;
@@ -606,15 +582,17 @@ class EventMap {
                 marker.on('add', () => marker.getElement().style.setProperty('--event-color', color));
             }
             marker.summary = events.length == 1 ? events[0].summary : null;
-            marker.event = events[0];
+            marker.events = events;
             marker.bindPopup(() => this._popup(events), {
                 className: 'event-popup', maxWidth: 550, minWidth: 220
             });
 
             this._markers.addLayer(marker);
-            if (openLocation && marker.getLatLng().equals(openLocation))
+            if (!replacement && events.some(event => openPopupEvents.has(event)))
                 replacement = marker;
         }
+
+        // Restore the popup as before the re-rendering
         if (replacement) {
             const popup = replacement.getPopup();
             const autoPan = popup.options.autoPan;
@@ -623,8 +601,66 @@ class EventMap {
             popup.getElement().querySelector('.event-details').scrollTop = scrollTop;
             popup.options.autoPan = autoPan;
         }
+
         this._updateLabels();
-        this._status.textContent = `${count} esemény · ${groups.size} helyszín`;
+        this._status.textContent = `${count} esemény · ${groups.length} helyszín`;
+    }
+
+    /** Filters events and groups nearby locations for marker rendering. */
+    _groupEvents() {
+        // Calculate date filter time range
+        const start = Math.max(
+            Date.now(),
+            this._start.value ? new Date(this._start.value + 'T00:00:00').getTime() : 0
+        );
+        const endDate = this._end.value ? new Date(this._end.value + 'T00:00:00') : null;
+        // Advance a calendar day to preserve inclusive ends through daylight saving changes.
+        endDate?.setDate(endDate.getDate() + 1);
+        const end = endDate?.getTime() ?? Infinity;
+
+        // Apply event marker filters
+        const groups = [];
+        const cells = new Map();
+        let count = 0;
+        for (const [index, event] of this._events.entries()) {
+            // Apply user filters
+            const tooFar = this._distanceLimit !== Infinity &&
+                (!this._distances || this._distances[index] > this._distanceLimit * 1000);
+            const outsideDates = event.end <= start || event.start >= end;
+            const hiddenCategory = !this._calendars.has(event.calendarId);
+            if (tooFar || outsideDates || hiddenCategory)
+                continue;
+
+            // Convert event coordinates to approximate 20-metre grid units for clustering
+            const north = event.coordinates[0] * (111000 / 20);
+            const east = event.coordinates[1] * (75000 / 20);
+            // Index location into ~20-metre cells
+            const row = Math.floor(north), column = Math.floor(east);
+            // Scan the 3x3 neighborhood of cells for an existing group within 1 cell distance
+            let group;
+            for (let rowOffset = -1; rowOffset <= 1 && !group; ++rowOffset) {
+                for (let columnOffset = -1; columnOffset <= 1 && !group; ++columnOffset) {
+                    const nearby = cells.get(`${row + rowOffset},${column + columnOffset}`);
+                    // Pythagoras distance is ok for such short distances
+                    group = nearby?.find(candidate =>
+                        (candidate.north - north) ** 2 + (candidate.east - east) ** 2 <= 1
+                    );
+                }
+            }
+
+            // Create a new event group
+            if (!group) {
+                group = { north, east, events: [] };
+                groups.push(group);
+                const key = `${row},${column}`;
+                if (!cells.has(key))
+                    cells.set(key, []);
+                cells.get(key).push(group);
+            }
+            group.events.push(event);
+            ++count;
+        }
+        return { groups, count };
     }
 
     /** Allocates labels only for visible event pins at town zoom or closer. */
@@ -638,8 +674,10 @@ class EventMap {
                     marker.unbindTooltip();
                 return;
             }
-            const dist = this._distances ? Math.round(marker.event.distance / 1000) + ' km' : '';
-            const text = [dist, marker.summary].filter(Boolean).join(' · ');
+            const text = [
+                this._distances ? Math.round(marker.events[0].distance / 1000) + ' km' : '',
+                marker.summary
+            ].filter(Boolean).join(' · ');
             if (!marker.getTooltip()) {
                 const label = document.createElement('span');
                 label.textContent = text;
