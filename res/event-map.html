@@ -29,6 +29,7 @@
 
   <!-- event map codebase and style -->
   <link rel="stylesheet" href="event-map.css">
+  <script src="event-map-geocoder.js" defer></script>
   <script src="event-map.js" defer></script>
 </head>
 <body>
@@ -50,6 +51,19 @@
           <legend id="distance-title">Távolság</legend>
           <input id="distance" type="range" min="5" max="401" step="1" value="401" aria-labelledby="distance-title" aria-describedby="filter-status">
           <output id="distance-value" for="distance">∞ km</output>
+          <div class="reference-location">
+            <label for="reference-address" title="Az események távolságát ettől a ponttól számítjuk a saját helyzeted helyett. A jelölő húzható, kattintással törölhető.">Viszonyítási hely</label>
+            <div class="reference-search">
+              <input id="reference-address" type="text" autocomplete="off" placeholder="Település vagy cím"
+                title="Írj be egy helynevet vagy címet, majd indíts keresést."
+                aria-controls="reference-results" aria-expanded="false" aria-describedby="reference-status">
+              <button id="reference-search" type="button" title="Hely keresése" aria-label="Hely keresése"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
+              <button id="reference-clear" type="button" title="Viszonyítási hely törlése" aria-label="Viszonyítási hely törlése"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            </div>
+            <ul id="reference-results" aria-label="Találatok" hidden></ul>
+            <div id="reference-status" role="status" aria-live="polite" hidden></div>
+            <small>Helykeresés: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap közreműködők (ODbL)</a></small>
+          </div>
         </fieldset>
         <button type="reset"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> Minden Esemény</button>
         <div id="filter-status" role="status" aria-live="polite" hidden></div>

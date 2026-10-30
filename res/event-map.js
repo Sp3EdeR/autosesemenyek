@@ -105,6 +105,7 @@ class EventMap {
         this._initDates();
         this._initDistance();
         this._initLocation();
+        this._initReference();
 
         // Update the dark/light theme now and on changes
         const theme = matchMedia('(prefers-color-scheme: dark)');
@@ -280,11 +281,14 @@ class EventMap {
             this._distanceRenderTimer = null;
             this._map.stopLocate();
             this._setLocation(null);
+            this._invalidateDistances();
+            this._closeReferenceResults();
         });
         window.addEventListener('pageshow', event => {
             if (!event.persisted)
                 return;
             this._resetDistance();
+            this._updateDistances();
             const resume = localStorage.eventMapLocation;
             this._locationControl.stop();
             if (resume)
@@ -307,16 +311,36 @@ class EventMap {
         }
     }
 
-    /** Sets the current location and updates distance display. null means no location. */
-    _setLocation(location, error = '') {
+    /** GPS remains available underneath the manual origin, including when tracking stops.
+     * @param location The new location to set. `null` clears the location.
+     * @param error An optional error message to display.
+     * @param force If `true`, forces the update even if a reference location exists.
+    */
+    _setLocation(location, error = '', force = false) {
         this._locationRequested = false;
-        this._location = location;
-        if (!location)
+        this._actualLocation = location;
+        if (this._referenceLocation && !force)
+            return;
+        this._location = this._referenceLocation || location;
+        if (force)
+            this._invalidateDistances();
+        if (!this._location)
             this._resetDistance(error);
         else {
             this._distanceStatus.hidden = true;
+            if (force)
+                this._renderDistance(true);
             this._updateDistances();
         }
+    }
+
+    /** Discards cached distances and stops any running distance worker. */
+    _invalidateDistances() {
+        this._distances = null;
+        this._distanceOrigin = null;
+        this._distanceJob = null;
+        this._distanceWorker?.terminate();
+        this._distanceWorker = null;
     }
 
     /** Updates the distance label based on the current distance value. */
@@ -332,13 +356,8 @@ class EventMap {
     _resetDistance(message = '') {
         this._distanceLimit = Infinity;
         this._distance.value = EventMap.Inf;
-        if (!this._location || message) {
-            this._distances = null;
-            this._distanceOrigin = null;
-            this._distanceJob = null;
-            this._distanceWorker?.terminate();
-            this._distanceWorker = null;
-        }
+        if (!this._location || message)
+            this._invalidateDistances();
         this._distanceStatus.textContent = message;
         this._distanceStatus.hidden = !message;
         this._updateDistanceLabel();
@@ -408,6 +427,155 @@ class EventMap {
         }
     }
 
+    /** Keeps a draggable manual distance origin independent of GPS tracking. */
+    _initReference() {
+        this._referenceAddress = document.getElementById('reference-address');
+        this._referenceResults = document.getElementById('reference-results');
+        this._referenceStatus = document.getElementById('reference-status');
+        this._referenceSearch = document.getElementById('reference-search');
+        this._geocoder = new EventMapGeocoder();
+        this._referenceSearchId = 0;
+        this._referenceSearch.addEventListener('click', () => this._searchReference());
+        document.getElementById('reference-clear').addEventListener('click', () =>
+            this._clearReference()
+        );
+        this._referenceAddress.addEventListener('keydown', event => {
+            if (event.key == 'Enter') {
+                event.preventDefault();
+                this._searchReference();
+            }
+        });
+        this._referenceAddress.addEventListener('input', () => this._closeReferenceResults());
+        document.getElementById('date-filter').addEventListener('toggle', event => {
+            if (!event.target.open)
+                this._closeReferenceResults();
+        });
+        if (localStorage.eventMapReference) {
+            try {
+                const { lat, lng, name } = JSON.parse(localStorage.eventMapReference);
+                if (typeof name != 'string' ||!EventMapGeocoder.isValidCoordinate(lat, lng))
+                    throw new Error('Invalid saved reference location.');
+                this._setReference(L.latLng(lat, lng), name, false);
+            } catch (error) {
+                console.error('Cannot restore reference location.', error);
+                localStorage.removeItem('eventMapReference');
+                this._showReferenceStatus('A mentett viszonyítási hely nem állítható vissza.');
+            }
+        }
+    }
+
+    /** Shows or hides the reference search status message. */
+    _showReferenceStatus(message = '') {
+        this._referenceStatus.textContent = message;
+        this._referenceStatus.hidden = !message;
+    }
+
+    /** Hides reference search results and invalidates pending searches. */
+    _closeReferenceResults() {
+        ++this._referenceSearchId;
+        this._referenceResults.replaceChildren();
+        this._referenceResults.hidden = true;
+        this._referenceAddress.setAttribute('aria-expanded', 'false');
+        this._showReferenceStatus();
+    }
+
+    /** Geocodes the reference address and applies a single match or lists several. */
+    async _searchReference() {
+        const query = this._referenceAddress.value.trim();
+        if (this._referenceSearch.disabled)
+            return;
+        this._closeReferenceResults();
+        if (!query) {
+            this._showReferenceStatus('Adj meg egy helynevet vagy címet.');
+            this._referenceAddress.focus();
+            return;
+        }
+        const id = this._referenceSearchId;
+        this._referenceSearch.disabled = true;
+        this._showReferenceStatus('Hely keresése...');
+        try {
+            // Do the geocoding search
+            const results = await this._geocoder.search(query);
+            if (id != this._referenceSearchId)
+                return; // The filter panel was closed, this search was invalidated
+            this._showReferenceStatus();
+            if (!results.length)
+                this._showReferenceStatus('Nincs találat. Próbálj pontosabb címet megadni.');
+            else if (results.length == 1)
+                this._setReference(L.latLng(results[0].lat, results[0].lng), results[0].name);
+            else {
+                // List multiple search results for the user to choose from
+                for (const result of results) {
+                    const item = document.createElement('li');
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.textContent = result.name;
+                    const details = document.createElement('small');
+                    details.textContent = [result.type,
+                        `${result.lat.toFixed(5)}, ${result.lng.toFixed(5)}`].filter(Boolean).join(' · ');
+                    button.append(details);
+                    button.addEventListener('click', () => {
+                        this._setReference(L.latLng(result.lat, result.lng), result.name);
+                        this._referenceAddress.focus();
+                    });
+                    item.append(button);
+                    this._referenceResults.append(item);
+                }
+                this._referenceResults.hidden = false;
+                this._referenceAddress.setAttribute('aria-expanded', 'true');
+                this._showReferenceStatus('Válassz egy helyszínt a találatok közül.');
+            }
+        } catch (error) {
+            console.error('Reference location search failed.', error);
+            if (id == this._referenceSearchId)
+                this._showReferenceStatus('A helykeresés sikertelen. Próbáld újra később.');
+        } finally {
+            this._referenceSearch.disabled = false;
+        }
+    }
+
+    /** Stores the reference location, updates its marker, and refreshes distances. */
+    _setReference(location, name, zoom = true) {
+        this._closeReferenceResults();
+        this._referenceLocation = location;
+        this._referenceAddress.value = name;
+        localStorage.eventMapReference = JSON.stringify({ lat: location.lat, lng: location.lng, name });
+        if (!this._referenceMarker) {
+            this._referenceMarker = L.marker(location, {
+                draggable: true, autoPan: true, zIndexOffset: 1000,
+                title: 'Viszonyítási hely: húzással áthelyezhető, kattintással törölhető.',
+                alt: 'Viszonyítási hely',
+                icon: L.divIcon({
+                    className: 'reference-marker', iconSize: [32, 40], iconAnchor: [16, 40],
+                    html: '<i class="fa-solid fa-map-pin" aria-hidden="true"></i>'
+                })
+            }).addTo(this._map);
+            // Drag the marker to change the reference location
+            this._referenceMarker.on('dragstart', () => this._closeReferenceResults());
+            this._referenceMarker.on('dragend', () => {
+                const point = this._referenceMarker.getLatLng().wrap();
+                this._setReference(point, `${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}`, false);
+            });
+            // Click the marker to clear the reference location
+            this._referenceMarker.on('click', () => this._clearReference());
+        } else
+            this._referenceMarker.setLatLng(location);
+        this._setLocation(this._actualLocation, '', true);
+        if (zoom)
+            this._map.setView(location, Math.max(17, this._map.getZoom()));
+    }
+
+    /** Removes the reference location and falls back to the GPS position. */
+    _clearReference() {
+        this._closeReferenceResults();
+        this._referenceMarker?.remove();
+        this._referenceMarker = null;
+        this._referenceLocation = null;
+        this._referenceAddress.value = '';
+        localStorage.removeItem('eventMapReference');
+        this._setLocation(this._actualLocation, '', true);
+    }
+
     /** Keeps empty start at now and empty end unbounded; end dates are inclusive. */
     _initDates() {
         this._start = document.getElementById('date-start');
@@ -459,12 +627,17 @@ class EventMap {
 
         // Limit the end time picker to dates after the start date.
         const endPicker = this._end._flatpickr;
+        const dateInputs = [
+            this._start, this._end,
+            this._start._flatpickr.altInput, endPicker.altInput
+        ];
         form.addEventListener('change', event => {
-            if (event.target == this._distance)
+            if (!dateInputs.includes(event.target))
                 return;
             const reversed = this._end.value && this._start.value > this._end.value;
-            endPicker.altInput.setCustomValidity(reversed ?
-                'A záródátum nem előzheti meg a kezdődátumot.' : '');
+            endPicker.altInput.setCustomValidity(
+                reversed ? 'A záródátum nem előzheti meg a kezdődátumot.' : ''
+            );
             if (!form.reportValidity())
                 return;
             endPicker.set('minDate', this._start.value || 'today');
@@ -474,6 +647,7 @@ class EventMap {
         // Close the filter when clicking outside of it or pressing Escape.
         const closeFilter = () => {
             filter.open = false;
+            this._closeReferenceResults();
             this._start._flatpickr.close();
             endPicker.close();
         };
