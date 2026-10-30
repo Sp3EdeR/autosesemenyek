@@ -142,6 +142,86 @@ input {
   background: color-mix(in srgb, var(--text) 14%, var(--surface));
 }
 
+.reference-location {
+  grid-column: 1 / -1;
+  min-width: 0;
+  position: relative;
+}
+.reference-search {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+.reference-search input {
+  flex: 1;
+  width: 0;
+}
+#date-form .reference-search button,
+#date-form #reference-results button {
+  background: color-mix(in srgb, var(--text) 8%, var(--surface));
+  border: none;
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+}
+#date-form .reference-search button {
+  width: 32px;
+}
+#date-form button:disabled {
+  cursor: wait;
+  opacity: .5;
+}
+#reference-results {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px #0006;
+  left: 0;
+  list-style: none;
+  margin: 4px 0 0;
+  max-height: min(240px, 35vh);
+  overflow-y: auto;
+  padding: 4px;
+  position: absolute;
+  right: 0;
+  z-index: 1;
+}
+#date-form #reference-results button {
+  background: none;
+  text-align: left;
+  width: 100%;
+}
+#date-form #reference-results button:hover,
+#date-form #reference-results button:focus-visible {
+  background: color-mix(in srgb, var(--text) 14%, var(--surface));
+}
+#reference-results small {
+  display: block;
+}
+#reference-status {
+  margin: 4px 0;
+}
+.reference-location > small {
+  display: block;
+  font-size: 10px;
+  margin-top: 4px;
+}
+.reference-location a {
+  color: inherit;
+}
+.reference-marker {
+  color: #2b93ee;
+  filter: drop-shadow(0 1px 2px #fff);
+  text-align: center;
+}
+.reference-marker i {
+  display: block;
+  font-size: 36px;
+  line-height: 40px;
+  paint-order: stroke fill;
+  -webkit-text-stroke: 3px #fff;
+}
+
 .flatpickr-wrapper,
 .flatpickr-wrapper input {
   width: 100%;
